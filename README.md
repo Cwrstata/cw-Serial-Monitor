@@ -48,5 +48,5 @@ This is basically my very first c# project so i apologize for the unholy code an
 * Windows 7/10/11
 
 
-## [License](https://github.com/Cwrstata/cw-Serial-Monitor/new/main?filename=README.md)
+## [License](https://github.com/Cwrstata/cw-Serial-Monitor/blob/main/LICENSE)
 
