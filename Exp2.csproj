@@ -2,13 +2,24 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net9.0-windows7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <SupportedOSPlatformVersion>7.0</SupportedOSPlatformVersion>
     <UseWPF>False</UseWPF>
     <ApplicationIcon>Serial.ico</ApplicationIcon>
+    <StartupObject></StartupObject>
+
+
+  <OptimizationPreference>Size</OptimizationPreference>
+  <StackTraceSupport>false</StackTraceSupport>
+  <InvariantGlobalization>true</InvariantGlobalization>
+
+	
+
+
+
   </PropertyGroup>
 
   <ItemGroup>

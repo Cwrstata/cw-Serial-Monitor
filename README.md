@@ -1,4 +1,4 @@
-# **cw Serial Monitor (v0.1.0a)**
+# **cw Serial Monitor (v0.1.1a)**
 
 
 
@@ -55,8 +55,7 @@ This is basically my very first c# project so i apologize for the unholy code an
 
 ## Requirements
 
-* .NET 8.0 (all in one executables are avaible)
-    * I dont know if i shuld revert back to .NET framework.
+* .NET 9.0 (all in one executables are avaible)
 * Windows 7/10/11
 
 

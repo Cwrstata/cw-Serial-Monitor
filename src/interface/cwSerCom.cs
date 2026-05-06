@@ -4,12 +4,13 @@
 //      https://github.com/Cwrstata/cw-Serial-Monitor
 //
 //      cwSerCom
-//          -v0.1.0a
+//          -v0.1.1a
+//      Fixed Minor bugs and removed unused code.
 // ---------------------------------------------------------------------------- //
 
 
 using Exp2.src.utils;
-using System.Diagnostics;
+
 using System.IO.Ports;
 
 
@@ -196,9 +197,9 @@ namespace Exp
                     textBox1.AppendText(outP);
                 }
 
-                } catch {
+                } catch(Exception err) {
 
-                    MessageBox.Show("An unxpected error occured while receaving data from Serial\n", "Serial Comunication Error",
+                    MessageBox.Show("An unxpected error occured while receaving data from Serial\n" + err.ToString(), "Serial Comunication Error",
                                     MessageBoxButtons.OK,
                                     MessageBoxIcon.Error);
 
@@ -232,15 +233,6 @@ namespace Exp
         }
 
 
-        private void dataGridView1_CellContentClick(object? sender, DataGridViewCellEventArgs e)
-        {
-
-        }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-
-        }
 
         private void Button_Connect(object? sender, EventArgs? e)
         {
@@ -306,8 +298,14 @@ namespace Exp
           
             if (SPort != null)
             {
-                SPort.DiscardInBuffer();
-                SPort.DiscardOutBuffer();
+                if (!SPort.IsOpen)
+                { // fixed bug 0x0001! 
+                    SPort.DiscardInBuffer();
+                    SPort.DiscardOutBuffer();
+                }
+                     
+                   
+               
                 SPort.Close();
 
                 CheckPort(); //Update status display
@@ -374,27 +372,10 @@ namespace Exp
 
         }
 
-        private void label1_Click(object sender, EventArgs e)
-        {
 
-        }
+     
 
-        private void flowLayoutPanel1_Paint(object sender, PaintEventArgs e)
-        {
-
-        }
-
-        private void label2_Click(object sender, EventArgs e)
-        {
-
-        }
-
-
-
-        private void SerialSend_TextChanged(object sender, EventArgs e)
-        {
-
-        }
+     
 
 
         void Button_Clear(object? sender, EventArgs? e)
@@ -407,10 +388,7 @@ namespace Exp
     
 
 
-        private void dGridSerial_Validated(object sender, EventArgs e)
-        {
-
-        }
+      
 
         private void cwSerCom_Shown(object sender, EventArgs e)
         {
@@ -437,10 +415,7 @@ namespace Exp
 
         }
 
-        private void textBox1_TextChanged(object sender, EventArgs e)
-        {
-
-        }
+     
     }
 
 

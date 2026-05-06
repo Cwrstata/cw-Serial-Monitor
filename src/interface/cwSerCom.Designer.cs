@@ -122,7 +122,7 @@ namespace Exp
             dGridInfo.Size = new Size(340, 179);
             dGridInfo.TabIndex = 3;
             dGridInfo.TabStop = false;
-            dGridInfo.CellContentClick += dataGridView1_CellContentClick;
+           
             dGridInfo.Move += dGridInfo_Move;
             dGridInfo.Resize += dGridInfo_Move;
             // 
@@ -140,7 +140,7 @@ namespace Exp
             textBox1.ScrollBars = ScrollBars.Vertical;
             textBox1.Size = new Size(564, 430);
             textBox1.TabIndex = 3;
-            textBox1.TextChanged += textBox1_TextChanged;
+          
             // 
             // splitMain
             // 
@@ -202,7 +202,7 @@ namespace Exp
             flowLayoutPanel1.Name = "flowLayoutPanel1";
             flowLayoutPanel1.Size = new Size(113, 152);
             flowLayoutPanel1.TabIndex = 2;
-            flowLayoutPanel1.Paint += flowLayoutPanel1_Paint;
+            
             // 
             // Connect
             // 
@@ -258,7 +258,7 @@ namespace Exp
             status.Text = "Disconnected";
             status.TextAlign = ContentAlignment.MiddleRight;
             status.UseMnemonic = false;
-            status.Click += label2_Click;
+           
             // 
             // led
             // 
@@ -272,7 +272,7 @@ namespace Exp
             led.TabIndex = 2;
             led.Text = "l";
             led.TextAlign = ContentAlignment.MiddleLeft;
-            led.Click += label1_Click;
+            
             // 
             // dGridSerial
             // 
@@ -304,9 +304,7 @@ namespace Exp
             dGridSerial.Size = new Size(340, 155);
             dGridSerial.TabIndex = 2;
             dGridSerial.TabStop = false;
-            dGridSerial.CellClick += dataGridView1_CellContentClick;
-            dGridSerial.CellContentClick += dataGridView1_CellContentClick;
-            dGridSerial.Validated += dGridSerial_Validated;
+            
             // 
             // label1
             // 
@@ -331,7 +329,7 @@ namespace Exp
             SerialSend.Size = new Size(450, 21);
             SerialSend.TabIndex = 4;
             SerialSend.WordWrap = false;
-            SerialSend.TextChanged += SerialSend_TextChanged;
+          
             // 
             // ClearSerial
             // 
@@ -449,7 +447,7 @@ namespace Exp
             Margin = new Padding(4, 3, 4, 3);
             Name = "cwSerCom";
             Text = "cwSerial";
-            Load += Form1_Load;
+            
             Shown += cwSerCom_Shown;
             ((System.ComponentModel.ISupportInitialize)dGridInfo).EndInit();
             splitMain.Panel1.ResumeLayout(false);
