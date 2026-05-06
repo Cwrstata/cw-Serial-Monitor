@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Compile Update="src\interface\cwSerCom.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="src\interface\cwSerCom.DataGrids.cs">
+      <DependentUpon>cwSerCom.cs</DependentUpon>
+      <SubType>Form</SubType>
+    </Compile>
+	<Compile Update="src\interface\cwSerCom.MenuBar.cs">
+	<DependentUpon>cwSerCom.cs</DependentUpon>
+      <SubType>Form</SubType>
+    </Compile>
+  </ItemGroup>
+</Project>

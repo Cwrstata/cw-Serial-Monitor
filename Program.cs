@@ -1,8 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+﻿// ---------------------------------------------------------------------------- //
+//  Cwrstata || cw Serial Monitor
+//      https://github.com/Cwrstata
+//      https://github.com/Cwrstata/cw-Serial-Monitor
+//
+//      Main
+// ---------------------------------------------------------------------------- //
+
+
+
+
+
+
+
 
 namespace Exp
 {
