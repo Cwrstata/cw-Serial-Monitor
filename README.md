@@ -16,10 +16,10 @@ _
 It features most of the basic serial monitor elements.
 My true intention for this project was file sharing through serial, a feature that i'll soon add.
 
-![Static Badge](https://img.shields.io/badge/Release-v0.1.0a-brightgreen?link=https%3A%2F%2Fgithub.com%2FCwrstata%2Fcw-Serial-Monitor%2Freleases%2Ftag%2Fv0.1.0a)
+![Static Badge](https://img.shields.io/badge/Release-v0.1.0a-brightgreen?link=https%3A%2F%2Fgithub.com%2FCwrstata%2Fcw-Serial-Monitor%2Freleases%2Ftag%2Fv0.1.1a)
 
 
-https://github.com/Cwrstata/cw-Serial-Monitor/releases/tag/v0.1.0a
+https://github.com/Cwrstata/cw-Serial-Monitor/releases/tag/v0.1.1a
 
 ## Usage
 
