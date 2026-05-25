@@ -1,4 +1,4 @@
-# **cw Serial Monitor (v0.1.1a)**
+# **cw Serial Monitor (v0.1.2a)**
 
 
 
@@ -6,7 +6,7 @@ A simple and lightweight window based Serial input and output application made i
 
 
 
-<img width="933" height="549" alt="image" src="https://github.com/user-attachments/assets/fd60fca3-7ff1-456d-b23b-9b22c6a30f3f" />
+<img width="933" height="549" alt="image" src="https://github.com/user-attachments/assets/a930ffd0-f442-4d74-a844-a112928298d0" />
 
 _
 
@@ -16,10 +16,10 @@ _
 It features most of the basic serial monitor elements.
 My true intention for this project was file sharing through serial, a feature that i'll soon add.
 
-![Static Badge](https://img.shields.io/badge/Release-v0.1.0a-brightgreen?link=https%3A%2F%2Fgithub.com%2FCwrstata%2Fcw-Serial-Monitor%2Freleases%2Ftag%2Fv0.1.1a)
+![Static Badge](https://img.shields.io/badge/Release-v0.1.2a-brightgreen?link=https%3A%2F%2Fgithub.com%2FCwrstata%2Fcw-Serial-Monitor%2Freleases%2Ftag%2Fv0.1.2a)
 
 
-https://github.com/Cwrstata/cw-Serial-Monitor/releases/tag/v0.1.1a
+https://github.com/Cwrstata/cw-Serial-Monitor/releases/tag/v0.1.2a
 
 ## Usage
 
@@ -42,14 +42,13 @@ This is basically my very first c# project so i apologize for the unholy code an
 ## To do
 
 * Auto connection and device recognition.
-* User's input options, like newline configuration.
 * Advanced Serial output options.
 * Advanced preferances window.
 * Advanced settings window.
 * Arrangeable and customizable UI.
-* File sharing from an to the device.
+* File sharing from and to the device.
 * Reorganize the code, the files and add notations.
-
+* Add an hexadecimal-based serial terminal.
 
 
 
