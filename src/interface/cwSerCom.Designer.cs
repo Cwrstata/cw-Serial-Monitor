@@ -36,10 +36,11 @@ namespace Exp
             DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle5 = new DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(cwSerCom));
-            listBox1 = new ListBox();
+            comPortsList = new ListBox();
             dGridInfo = new DataGridView();
-            textBox1 = new TextBox();
+            textBox1 = new RichTextBox();
             splitMain = new SplitContainer();
             splitContainer2 = new SplitContainer();
             flowLayoutPanel1 = new FlowLayoutPanel();
@@ -50,6 +51,8 @@ namespace Exp
             status = new Label();
             led = new Label();
             dGridSerial = new DataGridView();
+            serialNewline = new cwBorderComboBox();
+            label2 = new Label();
             label1 = new Label();
             SerialSend = new TextBox();
             ClearSerial = new Button();
@@ -80,18 +83,18 @@ namespace Exp
             menuStrip1.SuspendLayout();
             SuspendLayout();
             // 
-            // listBox1
+            // comPortsList
             // 
-            listBox1.Dock = DockStyle.Fill;
-            listBox1.Font = new Font("Microsoft Sans Serif", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            listBox1.FormattingEnabled = true;
-            listBox1.IntegralHeight = false;
-            listBox1.Location = new Point(0, 0);
-            listBox1.Margin = new Padding(4, 3, 4, 3);
-            listBox1.Name = "listBox1";
-            listBox1.Size = new Size(227, 152);
-            listBox1.TabIndex = 0;
-            listBox1.SelectedIndexChanged += listBox1_SelectedIndexChanged;
+            comPortsList.Dock = DockStyle.Fill;
+            comPortsList.Font = new Font("Microsoft Sans Serif", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            comPortsList.FormattingEnabled = true;
+            comPortsList.IntegralHeight = false;
+            comPortsList.Location = new Point(0, 0);
+            comPortsList.Margin = new Padding(4, 3, 4, 3);
+            comPortsList.Name = "comPortsList";
+            comPortsList.Size = new Size(227, 152);
+            comPortsList.TabIndex = 0;
+            comPortsList.SelectedIndexChanged += comPortList_SelectedIndexChanged;
             // 
             // dGridInfo
             // 
@@ -99,6 +102,7 @@ namespace Exp
             dGridInfo.AllowUserToDeleteRows = false;
             dGridInfo.AllowUserToResizeColumns = false;
             dGridInfo.AllowUserToResizeRows = false;
+            dGridInfo.BackgroundColor = SystemColors.Control;
             dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle1.BackColor = SystemColors.ControlLightLight;
             dataGridViewCellStyle1.Font = new Font("Microsoft Sans Serif", 8.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
@@ -108,6 +112,7 @@ namespace Exp
             dataGridViewCellStyle1.WrapMode = DataGridViewTriState.False;
             dGridInfo.DefaultCellStyle = dataGridViewCellStyle1;
             dGridInfo.Dock = DockStyle.Fill;
+            dGridInfo.GridColor = SystemColors.ControlLight;
             dGridInfo.ImeMode = ImeMode.Off;
             dGridInfo.Location = new Point(0, 155);
             dGridInfo.Margin = new Padding(4, 3, 4, 3);
@@ -122,25 +127,24 @@ namespace Exp
             dGridInfo.Size = new Size(340, 179);
             dGridInfo.TabIndex = 3;
             dGridInfo.TabStop = false;
-           
             dGridInfo.Move += dGridInfo_Move;
             dGridInfo.Resize += dGridInfo_Move;
             // 
             // textBox1
             // 
             textBox1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            textBox1.BorderStyle = BorderStyle.None;
             textBox1.Font = new Font("Microsoft Sans Serif", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
             textBox1.HideSelection = false;
-            textBox1.Location = new Point(1, 29);
-            textBox1.Margin = new Padding(4);
+            textBox1.Location = new Point(5, 33);
+            textBox1.Margin = new Padding(5);
             textBox1.MaximumSize = new Size(11665, 11537);
-            textBox1.Multiline = true;
             textBox1.Name = "textBox1";
             textBox1.ReadOnly = true;
-            textBox1.ScrollBars = ScrollBars.Vertical;
-            textBox1.Size = new Size(564, 430);
+            textBox1.ScrollBars = RichTextBoxScrollBars.Vertical;
+            textBox1.Size = new Size(579, 430);
             textBox1.TabIndex = 3;
-          
+            textBox1.Text = "";
             // 
             // splitMain
             // 
@@ -156,6 +160,8 @@ namespace Exp
             // 
             // splitMain.Panel2
             // 
+            splitMain.Panel2.Controls.Add(serialNewline);
+            splitMain.Panel2.Controls.Add(label2);
             splitMain.Panel2.Controls.Add(label1);
             splitMain.Panel2.Controls.Add(SerialSend);
             splitMain.Panel2.Controls.Add(textBox1);
@@ -177,7 +183,7 @@ namespace Exp
             // 
             // splitContainer2.Panel1
             // 
-            splitContainer2.Panel1.Controls.Add(listBox1);
+            splitContainer2.Panel1.Controls.Add(comPortsList);
             splitContainer2.Panel1.Controls.Add(flowLayoutPanel1);
             // 
             // splitContainer2.Panel2
@@ -202,7 +208,6 @@ namespace Exp
             flowLayoutPanel1.Name = "flowLayoutPanel1";
             flowLayoutPanel1.Size = new Size(113, 152);
             flowLayoutPanel1.TabIndex = 2;
-            
             // 
             // Connect
             // 
@@ -213,6 +218,7 @@ namespace Exp
             Connect.TabIndex = 0;
             Connect.Text = "Connect";
             Connect.UseVisualStyleBackColor = true;
+            Connect.Click += Button_Connect;
             // 
             // Disconnect
             // 
@@ -223,6 +229,7 @@ namespace Exp
             Disconnect.TabIndex = 1;
             Disconnect.Text = "Disconnect";
             Disconnect.UseVisualStyleBackColor = true;
+            Disconnect.Click += Button_Disconnect;
             // 
             // Refresh
             // 
@@ -233,6 +240,7 @@ namespace Exp
             Refresh.TabIndex = 5;
             Refresh.Text = "Refresh";
             Refresh.UseVisualStyleBackColor = true;
+            Refresh.Click += Button_Refresh;
             // 
             // panel1
             // 
@@ -249,8 +257,8 @@ namespace Exp
             // 
             status.AutoSize = true;
             status.BackColor = Color.Transparent;
-            status.Font = new Font("Microsoft Sans Serif", 8F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            status.Location = new Point(18, 5);
+            status.Font = new Font("Microsoft Sans Serif", 8.25F);
+            status.Location = new Point(22, 5);
             status.Margin = new Padding(4, 0, 4, 0);
             status.Name = "status";
             status.Size = new Size(73, 13);
@@ -258,21 +266,19 @@ namespace Exp
             status.Text = "Disconnected";
             status.TextAlign = ContentAlignment.MiddleRight;
             status.UseMnemonic = false;
-           
             // 
             // led
             // 
             led.BackColor = Color.Transparent;
             led.Font = new Font("Segoe UI Emoji", 14F, FontStyle.Regular, GraphicsUnit.Point, 2);
             led.ForeColor = Color.Red;
-            led.Location = new Point(-2, -2);
+            led.Location = new Point(1, -3);
             led.Margin = new Padding(4, 0, 4, 0);
             led.Name = "led";
             led.Size = new Size(33, 28);
             led.TabIndex = 2;
             led.Text = "l";
             led.TextAlign = ContentAlignment.MiddleLeft;
-            
             // 
             // dGridSerial
             // 
@@ -280,31 +286,66 @@ namespace Exp
             dGridSerial.AllowUserToDeleteRows = false;
             dGridSerial.AllowUserToResizeColumns = false;
             dGridSerial.AllowUserToResizeRows = false;
-            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle3.BackColor = SystemColors.ControlLightLight;
-            dataGridViewCellStyle3.Font = new Font("Microsoft Sans Serif", 8.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            dataGridViewCellStyle3.ForeColor = SystemColors.ControlText;
-            dataGridViewCellStyle3.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle3.SelectionForeColor = SystemColors.ControlDark;
-            dataGridViewCellStyle3.WrapMode = DataGridViewTriState.False;
-            dGridSerial.DefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle3.BackColor = SystemColors.ControlDarkDark;
+            dGridSerial.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle3;
+            dGridSerial.BackgroundColor = SystemColors.Control;
+            dataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle4.BackColor = SystemColors.Control;
+            dataGridViewCellStyle4.Font = new Font("Microsoft Sans Serif", 8.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            dataGridViewCellStyle4.ForeColor = SystemColors.ControlText;
+            dataGridViewCellStyle4.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle4.SelectionForeColor = SystemColors.ControlDark;
+            dataGridViewCellStyle4.WrapMode = DataGridViewTriState.False;
+            dGridSerial.DefaultCellStyle = dataGridViewCellStyle4;
             dGridSerial.Dock = DockStyle.Top;
             dGridSerial.EditMode = DataGridViewEditMode.EditOnEnter;
+            dGridSerial.GridColor = SystemColors.ControlLight;
             dGridSerial.ImeMode = ImeMode.Off;
             dGridSerial.Location = new Point(0, 0);
             dGridSerial.Margin = new Padding(4, 3, 4, 3);
             dGridSerial.Name = "dGridSerial";
             dGridSerial.RowHeadersVisible = false;
-            dataGridViewCellStyle4.BackColor = SystemColors.ControlLightLight;
-            dGridSerial.RowsDefaultCellStyle = dataGridViewCellStyle4;
-            dGridSerial.RowTemplate.DefaultCellStyle.BackColor = SystemColors.ControlLightLight;
+            dataGridViewCellStyle5.BackColor = SystemColors.ButtonShadow;
+            dGridSerial.RowsDefaultCellStyle = dataGridViewCellStyle5;
+            dGridSerial.RowTemplate.DefaultCellStyle.BackColor = SystemColors.Control;
             dGridSerial.RowTemplate.Height = 50;
             dGridSerial.ScrollBars = ScrollBars.Horizontal;
             dGridSerial.ShowEditingIcon = false;
             dGridSerial.Size = new Size(340, 155);
             dGridSerial.TabIndex = 2;
             dGridSerial.TabStop = false;
-            
+            // 
+            // serialNewline
+            // 
+            serialNewline.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            serialNewline.BackColor = SystemColors.ControlLight;
+            serialNewline.Borders = ScrollBars.Horizontal;
+            serialNewline.BorderStyle = Color.DarkGray;
+            serialNewline.DropDownStyle = ComboBoxStyle.DropDownList;
+            serialNewline.FlatStyle = FlatStyle.Popup;
+            serialNewline.Font = new Font("Microsoft YaHei", 8.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            serialNewline.ForeColor = SystemColors.ControlDarkDark;
+            serialNewline.Items.AddRange(new object[] { "\\n", "\\r", "\\r\\n", "none" });
+            serialNewline.Location = new Point(465, 2);
+            serialNewline.Name = "serialNewline";
+            serialNewline.Size = new Size(58, 24);
+            serialNewline.TabIndex = 8;
+            serialNewline.SelectedIndexChanged += serialNewline_SelectedIndexChanged;
+            // 
+            // label2
+            // 
+            label2.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            label2.BackColor = SystemColors.ControlLight;
+            label2.FlatStyle = FlatStyle.Flat;
+            label2.Font = new Font("Microsoft YaHei", 8.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label2.ForeColor = SystemColors.ControlDarkDark;
+            label2.Location = new Point(405, 0);
+            label2.Margin = new Padding(4, 0, 4, 0);
+            label2.Name = "label2";
+            label2.Size = new Size(180, 28);
+            label2.TabIndex = 9;
+            label2.Text = "New line:";
+            label2.TextAlign = ContentAlignment.MiddleLeft;
             // 
             // label1
             // 
@@ -315,7 +356,7 @@ namespace Exp
             label1.Location = new Point(1, 0);
             label1.Margin = new Padding(4, 0, 4, 0);
             label1.Name = "label1";
-            label1.Size = new Size(564, 30);
+            label1.Size = new Size(402, 28);
             label1.TabIndex = 7;
             label1.TextAlign = ContentAlignment.MiddleLeft;
             // 
@@ -323,25 +364,25 @@ namespace Exp
             // 
             SerialSend.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             SerialSend.Font = new Font("Microsoft Sans Serif", 8.9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            SerialSend.Location = new Point(4, 466);
+            SerialSend.Location = new Point(9, 466);
             SerialSend.Margin = new Padding(4, 3, 4, 3);
             SerialSend.Name = "SerialSend";
-            SerialSend.Size = new Size(450, 21);
+            SerialSend.Size = new Size(453, 21);
             SerialSend.TabIndex = 4;
             SerialSend.WordWrap = false;
-          
             // 
             // ClearSerial
             // 
             ClearSerial.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             ClearSerial.Font = new Font("Microsoft Sans Serif", 8.25F);
-            ClearSerial.Location = new Point(461, 466);
-            ClearSerial.Margin = new Padding(4, 3, 4, 3);
+            ClearSerial.Location = new Point(470, 466);
+            ClearSerial.Margin = new Padding(4, 0, 4, 0);
             ClearSerial.Name = "ClearSerial";
-            ClearSerial.Size = new Size(104, 23);
+            ClearSerial.Size = new Size(104, 21);
             ClearSerial.TabIndex = 6;
             ClearSerial.Text = "Clear";
             ClearSerial.UseVisualStyleBackColor = true;
+            ClearSerial.Click += Button_Clear;
             // 
             // menuStrip1
             // 
@@ -358,6 +399,7 @@ namespace Exp
             settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
             settingsToolStripMenuItem.Size = new Size(61, 20);
             settingsToolStripMenuItem.Text = "Settings";
+            settingsToolStripMenuItem.Click += settingsToolStripMenuItem_Click;
             // 
             // viewToolStripMenuItem
             // 
@@ -447,7 +489,7 @@ namespace Exp
             Margin = new Padding(4, 3, 4, 3);
             Name = "cwSerCom";
             Text = "cwSerial";
-            
+            Load += cwSerCom_Load;
             Shown += cwSerCom_Shown;
             ((System.ComponentModel.ISupportInitialize)dGridInfo).EndInit();
             splitMain.Panel1.ResumeLayout(false);
@@ -472,10 +514,10 @@ namespace Exp
 
         #endregion
 
-        private System.Windows.Forms.ListBox listBox1;
+        private System.Windows.Forms.ListBox comPortsList;
         private System.Windows.Forms.DataGridView dGridInfo;
         private System.IO.Ports.SerialPort SPort;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.RichTextBox textBox1;
         private System.Windows.Forms.SplitContainer splitMain;
         private System.Windows.Forms.SplitContainer splitContainer2;
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
@@ -502,6 +544,8 @@ namespace Exp
         private System.Windows.Forms.ToolStripMenuItem repositoryToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem infoToolStripMenuItem;
         private FolderBrowserDialog folderBrowserDialog1;
+        private cwBorderComboBox serialNewline;
+        private Label label2;
     }
 }
 

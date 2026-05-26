@@ -4,6 +4,8 @@
 //      https://github.com/Cwrstata/cw-Serial-Monitor
 //
 //      cwDataGrids
+//           -v0.1.2a
+//      Fixed some warings, just to be sure.
 // ---------------------------------------------------------------------------- //
 
 //This file contains everything that is related to the dataGridView objects in the form.
@@ -113,7 +115,7 @@ namespace Exp
 
 
 
-
+            //This needs a dedicated method.
 
             int cellsHeight = dGridSerial.ClientRectangle.Height - dGridSerial.ColumnHeadersHeight;
             int rowsHeight = cellsHeight / dGridSerial.Rows.Count;
@@ -128,8 +130,12 @@ namespace Exp
 
 
             dGridSerial.Height = dGridSerial.Rows[0].Height * 4 + dGridSerial.ColumnHeadersHeight + 1;
-            dGridSerial.Columns.GetLastColumn(DataGridViewElementStates.Visible,
-                                DataGridViewElementStates.None).AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            DataGridViewColumn? lastColumn = dGridSerial.Columns.GetLastColumn(DataGridViewElementStates.Visible,
+                                DataGridViewElementStates.None);
+            if (lastColumn != null)
+            {
+                lastColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            }
             dGridSerial.Refresh();
             dGridSerial.EndEdit();
 
@@ -141,7 +147,7 @@ namespace Exp
         }
         //Two click dropdown fix
         private void datagridview_CellEnter(object sender, DataGridViewCellEventArgs e)
-        {
+        { //It may do nothing a at all :<
            
             var datagridview = sender as DataGridView;
             if (datagridview == null || (e.RowIndex != -1 && e.ColumnIndex != -1)) { 
@@ -151,7 +157,11 @@ namespace Exp
             if (datagridview.Columns[e.ColumnIndex] is DataGridViewComboBoxColumn)
             {
                 datagridview.BeginEdit(true);
-                ((ComboBox)datagridview.EditingControl).DroppedDown = true;
+
+#pragma warning disable CS8602 
+                ((ComboBox?)datagridview.EditingControl).DroppedDown = true;
+#pragma warning restore CS8602 
+
             }
         }
 
@@ -191,16 +201,34 @@ namespace Exp
                 dGridInfo.ColumnHeadersDefaultCellStyle.BackColor = SystemColors.Control;
                 dGridInfo.Columns[0].SortMode = DataGridViewColumnSortMode.NotSortable;
                 dGridInfo.Columns[1].SortMode = DataGridViewColumnSortMode.NotSortable;
-
+                
                 //Cells
 
-                dGridInfo.Rows.Add("Caption", port["Caption"]?.ToString());
-                dGridInfo.Rows.Add("Manufacturer", port["Manufacturer"]?.ToString());
-                dGridInfo.Rows.Add("Description", port["Description"]?.ToString());
-                dGridInfo.Rows.Add("Present", port["Present"]?.ToString());
-                dGridInfo.Rows.Add("Status", port["Status"]?.ToString());
-                dGridInfo.Rows.Add(" PNP ID", port["PNPDeviceID"]?.ToString());
+                //Only non null information strings are displayed.
+                string? dataString = null;
 
+                dataString = port["Manufacturer"]?.ToString();
+                if (dataString != null)
+                    dGridInfo.Rows.Add("Manufacturer", dataString);
+
+                dataString = port["Description"]?.ToString();
+                if (dataString != null)
+                    dGridInfo.Rows.Add("Description", dataString);
+
+                dataString = port["Present"]?.ToString();
+                if (dataString != null)
+                    dGridInfo.Rows.Add("Present", dataString);
+
+                dataString = port["Status"]?.ToString();
+                if (dataString != null)
+                    dGridInfo.Rows.Add("Status", dataString);
+
+                dataString = port["PNPDeviceID"]?.ToString();
+                if (dataString != null)
+                    dGridInfo.Rows.Add("PNP ID", dataString);
+
+
+         
 
 
 
@@ -217,8 +245,13 @@ namespace Exp
                     row.Height = rowsHeight;
                 }
 
-                dGridInfo.Columns.GetLastColumn(DataGridViewElementStates.Visible,
-                                    DataGridViewElementStates.None).AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                DataGridViewColumn? lastColumn = dGridInfo.Columns.GetLastColumn(DataGridViewElementStates.Visible,
+                                    DataGridViewElementStates.None);
+                if (lastColumn != null)
+                {
+                    lastColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                }
+            
                 dGridInfo.SelectionMode = 0;
 
                 dGridInfo.ClearSelection();

@@ -11,15 +11,13 @@
 
 
 
-
-
+// The namespace for the entire project.
 namespace Exp
 {
+    
     internal static class Program
     {
-        /// <summary>
-        /// Punto di ingresso principale dell'applicazione.
-        /// </summary>
+        
         [STAThread]
         static void Main()
         {

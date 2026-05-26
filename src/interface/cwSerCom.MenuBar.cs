@@ -100,7 +100,7 @@ namespace Exp
 
         private void infoToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Version: " + cwVersion, "cw Serial Monitor",
+            MessageBox.Show("Version: " + cwVersion+ "\r\n\r\n@Cwrstata", "cw Serial Monitor",
                                    MessageBoxButtons.OK,
                                    MessageBoxIcon.Information);
         }
