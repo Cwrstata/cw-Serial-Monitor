@@ -39,7 +39,7 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Update="src\interface\cwSerCom - Copia.DataGrids.cs">
+    <Compile Update="src\interface\cwSerCom.Serial.cs">
       <SubType>Form</SubType>
       <DependentUpon>cwSerCom.cs</DependentUpon>
     </Compile>
@@ -50,6 +50,10 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="icons\" />
   </ItemGroup>
 
 </Project>

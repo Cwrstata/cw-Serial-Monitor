@@ -4,8 +4,8 @@
 //      https://github.com/Cwrstata/cw-Serial-Monitor
 //
 //      cwDataGrids
-//           -v0.1.2a
-//      Fixed some warings, just to be sure.
+//           -v0.1.3a
+//      Moved some methods to .Serial.cs
 // ---------------------------------------------------------------------------- //
 
 //This file contains everything that is related to the dataGridView objects in the form.
@@ -18,6 +18,9 @@ namespace Exp
     
     partial class cwSerCom
     {
+
+        List<bool> BluetoothList = new List<bool>();
+
         //Serial Settings
 
         //Serial Settings options definition;
@@ -169,6 +172,11 @@ namespace Exp
         /// Abquires port informations trough ManagementObjectSearcher, then redraws the grid.
         /// 
         /// </summary>
+        /// 
+
+        
+
+
         public void GetComPortDetails(string? portn)
         {
             //To do
@@ -180,7 +188,7 @@ namespace Exp
                 return;
             }
 
-            using (var searcher = new ManagementObjectSearcher($"SELECT * FROM Win32_PnPEntity WHERE Caption LIKE '%({portn}%)'"))
+            using (var searcher = new ManagementObjectSearcher($"SELECT * FROM Win32_PnPEntity WHERE Caption LIKE '%({portn})%'"))
             {
                 // cellBaudRates.DetachEditingControl();
 
@@ -201,11 +209,15 @@ namespace Exp
                 dGridInfo.ColumnHeadersDefaultCellStyle.BackColor = SystemColors.Control;
                 dGridInfo.Columns[0].SortMode = DataGridViewColumnSortMode.NotSortable;
                 dGridInfo.Columns[1].SortMode = DataGridViewColumnSortMode.NotSortable;
-                
+               ;
                 //Cells
 
                 //Only non null information strings are displayed.
                 string? dataString = null;
+
+                dataString = port["Caption"]?.ToString();
+                if (dataString != null)
+                    dGridInfo.Rows.Add("Caption", dataString);
 
                 dataString = port["Manufacturer"]?.ToString();
                 if (dataString != null)
@@ -228,7 +240,7 @@ namespace Exp
                     dGridInfo.Rows.Add("PNP ID", dataString);
 
 
-         
+                
 
 
 

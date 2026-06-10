@@ -4,18 +4,15 @@
 //      https://github.com/Cwrstata/cw-Serial-Monitor
 //
 //      cwSerCom
-//          -v0.1.2a
-//      Added a newline configuration combobox.
+//          -v0.1.3a
+//      Settings can be now configured in an apporiate setting form.
+//      Devices are automaticly detected.
+//      Besides the port names, an icon appears indicating the device type.
 // ---------------------------------------------------------------------------- //
 
 
-using Exp2.src.utils;
-
 using System.IO.Ports;
-using System.Text.RegularExpressions;
 
-
-//Ported from .NET 4.7 to 8.0
 
 namespace Exp
 {
@@ -29,63 +26,52 @@ namespace Exp
     {
 
 
-        const string cwVersion = "v0.1.2a";
+        public static readonly string cwVersion = "v0.1.3a";
 
         //Rappresents the port indicator text, "Connected" = true;
         bool pOpen = false;
-
-
-
-
+        string[]? ports_sr = null; //list of detected com ports.
 
         /// <summary>
-        /// Displays the status of the port in the interface in the appropriate label.
+        /// Pocesses Windows Messages
+        /// Overrided to handle WM_DEVICECHANGE.
         /// </summary>
-        /// <returns>Returns true if the port is connected, in any other case it returns false.</returns>
-        public bool CheckPort()
+        /// <param name="m"></param>
+        protected override void WndProc(ref Message m)
         {
-
-
-            if (SPort == null) { return false; }
-            if (pOpen)
+            switch (m.Msg)
             {
-                if (!SPort.IsOpen)
-                {
+                //WM_DEVICECHANGE
+                case 537:
+
+                    if (appSettings.list_auto_refresh)
+                    {
+                        CheckPort();
 
 
-                    led.ForeColor = Color.Red;
-                    led.TextAlign = ContentAlignment.MiddleLeft;
-                    status.Text = "Disconnected";
-                    status.Left -= 6;
-                    pOpen = false;
+                        Port_Refresh();
 
-                }
-                return pOpen;
+                    }
+
+
+                    break;
             }
-
-            if (SPort.IsOpen)
-            {
-                pOpen = true;
-
-                led.ForeColor = Color.LimeGreen;
-                led.TextAlign = ContentAlignment.MiddleRight;
-                status.Text = "Connected";
-                status.Left += 6;
-
-
-            }
-            return pOpen;
+            base.WndProc(ref m);
         }
+
+
+
+        
 
 
 
         public cwSerCom()
         {
             InitializeComponent();
-            
 
-            
-            Button_Refresh(0, null);
+
+
+            Port_Refresh();
 
 
             SerialSend.KeyDown += SerialSend_KeyDown;
@@ -96,178 +82,7 @@ namespace Exp
 
 
 
-        //Sends data to serial
-
-
-        /// <summary>
-        /// Called when a key is pressed on the serial console.
-        /// When the enter key is pressed, and the port is in a working condition, prints all contained text to serial.
-        /// </summary>
-        private void SerialSend_KeyDown(object? sender, KeyEventArgs e)
-        {
-
-
-
-            if (e.KeyCode == Keys.Enter)
-            {
-
-                if (SPort == null)
-                {
-                    e.SuppressKeyPress = true;
-                    return;
-                }
-
-                try
-                {
-                    if (SPort.IsOpen)
-                    {
-
-                        SPort.Write(SerialSend.Text.ToString() + serial_newLine_s);
-                        SerialSend.Clear();
-                        e.SuppressKeyPress = true;
-                    }
-                    else { Port_Disconnect(); }
-                }
-                catch
-                {
-                    if (pOpen)
-                    {
-                        MessageBox.Show("Unable to send data to serial", "Serial Comunication Error",
-                                         MessageBoxButtons.OK,
-                                         MessageBoxIcon.Error);
-                    }
-
-                    Port_Disconnect();
-
-                }
-
-
-
-            }
-
-
-
-        }
-
-        /// <summary>
-        /// Called when any data is received trough serial.
-        /// Reads the raw data and prints it to the console.
-        /// </summary>
-        private void SPort_DataReceived(object? sender, SerialDataReceivedEventArgs? e)
-        {
-
-
-            if (SPort == null)
-            {
-                return;
-            }
-
-            if (!SPort.IsOpen)
-            {
-                Port_Disconnect();
-                return;
-            }
-
-            try
-            {
-                while (SPort.BytesToRead != 0)
-                {
-
-                    string outP = SPort.ReadExisting();
-                    if (textBox1.InvokeRequired)
-                    {
-                        textBox1.Invoke(new Action(() => textBox1.AppendText(outP))
-
-                        );
-
-                    }
-                    else
-                    {
-
-                        textBox1.AppendText(outP);
-                    }
-
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("An unxpected error occured while receiving data from Serial\n" + ex.ToString(), "Serial Comunication Error",
-                                    MessageBoxButtons.OK,
-                                    MessageBoxIcon.Error);
-            }
-
-            //The previus loop had a line by line based approach.
-            //In the future, you will be able to choose how the data is read and printed on the settings panel.
-            /*
-            try
-            {
-                while (SPort.BytesToRead != 0)
-                {
-
-                    string outP = SPort.ReadLine() + Environment.NewLine;
-                    if (textBox1.InvokeRequired)
-                    {
-                        textBox1.Invoke(new Action(() => textBox1.AppendText(outP))
-
-                        );
-
-                    }
-                    else
-                    {
-
-                        textBox1.AppendText(outP);
-                    }
-
-                }
-
-
-
-            }
-            catch (InvalidOperationException err)
-            {
-
-                MessageBox.Show("An unxpected error occured while receiving data from Serial\n" + err.ToString(), "Serial Comunication Error",
-                                     MessageBoxButtons.OK,
-                                     MessageBoxIcon.Error);
-            }
-            catch
-            {
-
-                try
-                {
-                    string outP = SPort.ReadExisting();
-                    if (textBox1.InvokeRequired)
-                    {
-                        textBox1.Invoke(new Action(() => textBox1.AppendText(outP))
-
-                        );
-
-                    }
-                    else
-                    {
-
-                        textBox1.AppendText(outP);
-                    }
-
-                }
-                catch
-                {
-
-                    MessageBox.Show("An unxpected error occured while receiving data from Serial\n", "Serial Comunication Error",
-                                    MessageBoxButtons.OK,
-                                    MessageBoxIcon.Error);
-
-                }
-
-            }
-            ;*/
-        }
-
-        private void SPort_Error(object? sender, SerialErrorReceivedEventArgs e)
-        {
-
-            Port_Disconnect();
-        }
+        
 
         /// <summary>
         /// Called every time a new port is selected to retrieve all avaible informations.
@@ -280,11 +95,11 @@ namespace Exp
             {
 
                 if (comPortsList.SelectedIndex != -1 && comPortsList.SelectedIndex < comPortsList.Items.Count)
-            {
-                
+                {
+
                     if (comPortsList.SelectedItem == null) { return; }
 
-                
+
                     GetComPortDetails(comPortsList.SelectedItem.ToString());
                 }
 
@@ -313,8 +128,8 @@ namespace Exp
             ;
             SPort = new SerialPort(comPortsList.SelectedItem.ToString());
 
-            
-            if (cellBaudRates.Value==null || cellParityType.Value==null || cellStopBits.Value==null || cellDataBits.Value==null)
+
+            if (cellBaudRates.Value == null || cellParityType.Value == null || cellStopBits.Value == null || cellDataBits.Value == null)
             {
                 //no more warnigs now hehe
                 return;
@@ -323,7 +138,7 @@ namespace Exp
 
             SPort.BaudRate = (int)cellBaudRates.Value;
             SPort.ReadTimeout = 500;
-            // SPort.WriteTimeout = 500;
+            SPort.WriteTimeout = 500;
             SPort.Parity = (Parity)cellParityType.Items.IndexOf((string)cellParityType.Value);
             SPort.StopBits = (StopBits)cellStopBits.Value;
             SPort.DataBits = (int)cellDataBits.Value;
@@ -367,93 +182,19 @@ namespace Exp
 
         }
 
-        /// <summary>
-        /// Used to conclude the serial connection.
-        /// </summary>
-        /// <returns>Returns false if there was no connection to begin with.</returns>
-        private bool Port_Disconnect()
-        {
-
-            if (SPort != null)
-            {
-                if (SPort.IsOpen)
-                { // fixed bug 0x0001! 
-                    SPort.DiscardInBuffer();
-                    SPort.DiscardOutBuffer();
-                }
-
-
-
-                SPort.Close();
-
-                CheckPort(); //Update status display
-                SPort = null;
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
-                //If SPort is not cleared a ghost port may be detected
-                return true;
-            }
-
-            return false;
-        }
+       
 
         void Button_Refresh(object? sender, EventArgs? e)
         {
 
+            Port_Refresh();
 
-            if (SPort != null && !SPort.IsOpen)
-            {
-                Port_Disconnect(); //Clean all previus connections
-            }
-
-
-
-
-
-            string? lastPortName = " ";
-            var lastPort = comPortsList.SelectedIndex; //Saves the last selected port to reselect it after the refresh
-
-            if (comPortsList.Items.Count != 0 && comPortsList.Items.Count > lastPort && lastPort != -1)
-            {
-
-                if (comPortsList.SelectedItem == null) { return; }
-                lastPortName = comPortsList.SelectedItem.ToString();
-            }
-            else { lastPort = -1; } //Clear Selection
-
-            comPortsList.ClearSelected();
-            comPortsList.Items.Clear();
-
-            //Fill the serial port list
-            string[] ports = SerialPort.GetPortNames();
-
-
-            foreach (string port in ports)
-            {
-                comPortsList.Items.Add(port);
-            }
-
-
-            if (lastPort != -1 && comPortsList.Items.Count > lastPort)
-            {
-                comPortsList.SelectedIndex = lastPort;
-                if (comPortsList.SelectedItem == null) { return; }
-                if (lastPortName != comPortsList.SelectedItem.ToString())
-                {
-
-                    comPortsList.SelectedIndex = -1;
-
-                }
-                return;
-            }
-            comPortsList.SelectedIndex = -1;
 
         }
 
 
 
-
-
+        
 
 
         void Button_Clear(object? sender, EventArgs? e)
@@ -491,10 +232,11 @@ namespace Exp
 
             datagridview.SelectionMode = 0;
 
-            if (lastColumn==null) { return; };
+            if (lastColumn == null) { return; }
+            ;
 
             lastColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-           
+
 
         }
 
@@ -503,7 +245,12 @@ namespace Exp
         private void cwSerCom_Load(object sender, EventArgs e)
         {
             //Sets the default newline to "\n";
-            serialNewline.SelectedIndex = 0; 
+            serialNewline.SelectedIndex = 0;
+
+
+            lSettings.read();
+            appSettings = lSettings.appSettings;
+            applySettings();
         }
 
 
@@ -543,15 +290,108 @@ namespace Exp
 
         private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //cwSettings SettingsForm = new cwSettings();
-            //SettingsForm.ShowDialog();
+            using (cwSettings SettingsForm = new cwSettings()) { 
 
 
-            //The settings form is currently being developed; 
+            SettingsForm.ShowDialog();
+
+
+
+                SettingsForm.Dispose();
+                applySettings();
+
+        }
+        }
+
+        void applySettings() {
+
+           
+            if (appSettings.show_port_type_icon == true)
+            {
+                comPortsList.DrawMode = DrawMode.OwnerDrawFixed;
+            }
+            else {
+                comPortsList.DrawMode = DrawMode.Normal;
+            }
+
+            label3.Visible = !appSettings.list_auto_refresh;
+
+
 
         }
 
         
+        
+
+        public static cwSettingsManager lSettings = new cwSettingsManager();
+        static cwAppSettings appSettings = lSettings.appSettings;
+        private void comPortsList_DrawItem(object sender, DrawItemEventArgs e)
+        {
+           
+            if (!appSettings.show_port_type_icon) { return; }
+
+            //Check if the item is selected to draw the correct icon
+            bool isSelected = (e.State & DrawItemState.Selected) == DrawItemState.Selected;
+
+            if (e.Index < 0) return;
+
+
+
+            e.DrawBackground();
+
+            
+            Image icon;
+            string ?itemText = comPortsList.Items[e.Index].ToString();
+            if (e.Index >= 0)
+            {
+               
+
+
+                if (BluetoothList[e.Index])
+                {
+                    if (isSelected)
+                    {
+                        icon = imageList1.Images[1]; 
+                    }
+                    else
+                    {
+                        icon = imageList1.Images[0]; 
+                    }
+
+                }
+                else
+                {
+
+                    if (isSelected)
+                    {
+                        icon = imageList1.Images[3];
+                    }
+                    else
+                    {
+                        icon = imageList1.Images[2]; 
+                    }
+                }
+
+                Rectangle iconBounds = new Rectangle(e.Bounds.X + e.Bounds.Width - 25, e.Bounds.Y + (e.Bounds.Height - 18) / 2, 18, 18);
+
+                Rectangle textBounds = new Rectangle(e.Bounds.X, e.Bounds.Y, e.Bounds.Width - 35, e.Bounds.Height);
+
+                
+
+                e.Graphics.DrawImage(icon, iconBounds);
+
+                
+                TextRenderer.DrawText(e.Graphics, itemText, e.Font, textBounds, e.ForeColor, TextFormatFlags.Left | TextFormatFlags.VerticalCenter);
+
+
+                e.DrawFocusRectangle();
+            }
+        }
+
+        private void comPortsList_Resize(object sender, EventArgs e)
+        {
+            comPortsList.Invalidate();
+        }
     }
 
 

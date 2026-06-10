@@ -4,24 +4,29 @@
 //      https://github.com/Cwrstata/cw-Serial-Monitor
 //
 //      cwSerCom
-//          -v0.1.2a
-//      Unused Settings Form.
+//          -v0.1.3a
+//      Settings Form!!
 // ---------------------------------------------------------------------------- //
-/*
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+
+
 
 namespace Exp
 {
     public partial class cwSettings : Form
     {
+
+        /// <summary>
+        /// Global app settings manager referance
+        /// </summary>
+        static cwSettingsManager lSettings = cwSerCom.lSettings;
+
+        /// <summary>
+        /// Global app settings referance
+        /// </summary>
+        static cwAppSettings appSettings = cwSerCom.lSettings.appSettings;
+
+
+
         /// <summary>
         /// Previusly selected button in the tab selector
         /// </summary>
@@ -31,7 +36,7 @@ namespace Exp
             InitializeComponent();
             previus_label = tab_General;
 
-          
+
         }
 
 
@@ -56,18 +61,45 @@ namespace Exp
             previus_label = tab_Serial;
         }
 
-        private void toolTip1_Popup(object sender, PopupEventArgs e)
-        {
-            
-        }
+ 
 
         private void cwSettings_Load(object sender, EventArgs e)
         {
+
+            tabControl.ItemSize = new Size(0, 1);
             toolTip1.SetToolTip(label2, "The method by which the data is received and printed to the console\r\n" +
                 "When \"Line by line\" is chosen, the program will wait for a new line character before printing to the console.");
             toolTip1.SetToolTip(comboBox2, "The method by which the data is received and printed to the console\r\n" +
                 "When \"Line by line\" is chosen, the program will wait for a new line character before printing to the console.");
+
+            lSettings.read();
+
+
+            check_show_port_icon.Checked = appSettings.show_port_type_icon;
+            check_list_auto_refresh.Checked = appSettings.list_auto_refresh;
         }
+
+    
+
+        private void resetall_Click(object sender, EventArgs e)
+        {
+
+
+            cwAppSettings copy = new cwAppSettings();
+
+            check_show_port_icon.Checked = copy.show_port_type_icon;
+            check_list_auto_refresh.Checked = copy.list_auto_refresh;
+        }
+
+
+        private void Save_Button_Click(object sender, EventArgs e)
+        {
+            appSettings.show_port_type_icon = check_show_port_icon.Checked;
+            appSettings.list_auto_refresh = check_list_auto_refresh.Checked;
+            lSettings.write(appSettings);
+            this.Close();
+        }
+
+        
     }
 }
-*/

@@ -8,7 +8,7 @@
 
 
 //Simple flipflop class
-namespace Exp2.src.utils
+namespace Exp
 {
     public class cwToggle
     {
