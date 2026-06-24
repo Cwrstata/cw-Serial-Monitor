@@ -4,15 +4,18 @@
 //      https://github.com/Cwrstata/cw-Serial-Monitor
 //
 //      cwSerial
-//           -v0.1.3a
-//      
+//           -v0.1.4a
+//      Bux fixes.
+//      Using SerialPortStream instead of IO.Ports.
+//      Improved Error Handling.      
+//
 // ---------------------------------------------------------------------------- //
 
 //Contains most of the methods related to the comunication aspect.
 //At least for now, this was not wrapped in a separate class because most of the methods strictly interact with the main form.
 
 
-using System.IO.Ports;
+using RJCP.IO.Ports;
 using System.Management;
 
 
@@ -23,8 +26,10 @@ namespace Exp
     {
 
 
-        private System.IO.Ports.SerialPort ? SPort;
+        private SerialPortStream ? SPort = null;
 
+
+        
         /// <summary>
         /// Displays the status of the port in the interface in the appropriate label.
         /// </summary>
@@ -32,34 +37,35 @@ namespace Exp
         public bool CheckPort()
         {
 
+            if (pOpen==true) {
 
-            if (SPort == null) { return false; }
-            if (pOpen)
-            {
-                if (!SPort.IsOpen)
+                if (SPort != null)
                 {
-
-
-                    led.ForeColor = Color.Red;
-                    led.TextAlign = ContentAlignment.MiddleLeft;
-                    status.Text = "Disconnected";
-                    status.Left -= 6;
-                    pOpen = false;
-                    Port_Disconnect(); //Prevents ghost ports, helpfull with the automatic ports detection.
+                    return true;
 
                 }
-                return pOpen;
-            }
+               
 
-            if (SPort.IsOpen)
+                led.ForeColor = Color.Red;
+                led.TextAlign = ContentAlignment.MiddleLeft;
+                status.Text = "Disconnected";
+                status.Left -= 6;
+                pOpen = false;
+
+
+            } else
             {
-                pOpen = true;
+                if (SPort == null)
+                {
+                    return true;
+
+                }
 
                 led.ForeColor = Color.LimeGreen;
                 led.TextAlign = ContentAlignment.MiddleRight;
                 status.Text = "Connected";
                 status.Left += 6;
-
+                pOpen = true;
 
             }
             return pOpen;
@@ -72,27 +78,30 @@ namespace Exp
             BluetoothList.Clear();
             using (var searcher = new ManagementObjectSearcher($"SELECT PNPDeviceID FROM Win32_PnPEntity WHERE Caption LIKE '%(COM%'"))
             {
-                // cellBaudRates.DetachEditingControl();
 
+                // fixed bug 0x0003
 
-                foreach (var item in searcher.Get())
-                {
-                   
-                    if (item["PNPDeviceID"]?.ToString()[0] == 'B')
+                
+                    foreach (var item in searcher.Get())
                     {
 
-                        BluetoothList.Add(true);
+                        if (item["PNPDeviceID"]?.ToString()[0] == 'B')
+                        {
+
+                            BluetoothList.Add(true);
+
+
+                        }
+                        else
+                        {
+                            BluetoothList.Add(false);
+
+                        }
 
 
                     }
-                    else { BluetoothList.Add(false); }
 
-
-
-                }
-
-
-
+                
 
 
             }
@@ -127,13 +136,13 @@ namespace Exp
                     }
                     else { Port_Disconnect(); }
                 }
-                catch
+                catch (Exception ex)
                 {
                     if (pOpen)
                     {
-                        MessageBox.Show("Unable to send data to serial", "Serial Comunication Error",
-                                         MessageBoxButtons.OK,
-                                         MessageBoxIcon.Error);
+
+                        cwError.ErrorInfo(ex, "Serial Out (4xCw)", "Unable to send data to serial",this);
+                      
                     }
 
                     Port_Disconnect();
@@ -190,9 +199,9 @@ namespace Exp
             }
             catch (Exception ex)
             {
-                MessageBox.Show("An unxpected error occured while receiving data from Serial\n" + ex.ToString(), "Serial Comunication Error",
-                                    MessageBoxButtons.OK,
-                                    MessageBoxIcon.Error);
+
+                cwError.ErrorInfo(ex, "Serial In (3xCw)", "An unxpected error occured while receiving data from Serial", this);
+               
             }
 
             //The previus loop had a line by line based approach.
@@ -277,45 +286,156 @@ namespace Exp
 
             if (SPort != null)
             {
-                if (SPort.IsOpen)
-                { // fixed bug 0x0001! 
-                    SPort.DiscardInBuffer();
-                    SPort.DiscardOutBuffer();
-                }
+              
 
 
 
-                SPort.Close();
 
-                CheckPort(); //Update status display
-                SPort = null;
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
-                //If SPort is not cleared a ghost port may be detected
+
+
+              
+
+                    SPort.Close();
+                    SPort.Dispose();
+
+
+                    SPort = null;
+
+                    CheckPort();
+
+
+
+
                 return true;
             }
 
             return false;
         }
 
+        private bool Port_Connect(string? port)
+        {
+            
 
+
+            Port_Refresh();
+
+            if (port == null) { return false; }
+
+            if (SPort != null && SPort.IsOpen)
+            {
+                Port_Disconnect();
+            }
+
+
+
+            if (cellBaudRates.Value == null || cellParityType.Value == null || cellStopBits.Value == null || cellDataBits.Value == null)
+            {
+                //no more warnigs now hehe
+                return false;
+            }
+            SPort = new SerialPortStream(port);
+
+            SPort.BaudRate = (int)cellBaudRates.Value;
+            SPort.ReadTimeout = 500;
+            SPort.WriteTimeout = 500;
+            SPort.Parity = (Parity)cellParityType.Items.IndexOf((string)cellParityType.Value);
+            SPort.StopBits = (StopBits)cellStopBits.Value;
+            SPort.DataBits = (int)cellDataBits.Value;
+
+            SPort.DtrEnable = false;
+            SPort.RtsEnable = false;
+
+            SPort.Handshake = Handshake.None;
+
+
+            this.Cursor = Cursors.WaitCursor;
+            try { SPort.Open(); }
+            catch (Exception ex)
+            {
+
+                this.Cursor = Cursors.Default;
+                Port_Disconnect();
+
+
+                cwError.ErrorInfo(ex, "Serial (1xCw)", "Port connection error", this);
+
+                return false;
+            }
+            this.Cursor = Cursors.Default;
+
+            if (SPort.IsOpen)
+            {
+                try
+                {
+                    CheckPort();
+                    SPort.DataReceived += SPort_DataReceived;
+
+                    SPort.ErrorReceived += SPort_Error;
+
+
+
+
+                    if (SPort.BytesToRead != 0)
+                    {
+                        SPort.DiscardInBuffer();
+                    }
+                }
+                catch (Exception ex)
+                {
+
+                    cwError.ErrorInfo(ex, "Serial (2xCw)", "Port connection error", this);
+
+                }
+
+
+                if (cellParityType.Value == null) { return true; } //Retruns True no indicator si displayed
+                if (cellParityType.Value.ToString() == null) { return true; }
+
+                
+
+#pragma warning disable CS8602 
+                label1.Text = "  " + SPort.PortName.ToString() + "    Baud rate: " + SPort.BaudRate.ToString()
+                    + "     Type: " + SPort.DataBits + cellParityType.Value.ToString()[0] + (int)(StopBits)cellStopBits.Value;
+#pragma warning restore CS8602 
+                ;
+
+                if (SPort.BaudRate != (int)cellBaudRates.Value) { label1.Text += "    USB-CDC"; }
+
+
+            }
+
+
+            return true;
+        }
+
+        //string? riconnectTo_s = null;
         void Port_Refresh()
         {
 
-
+       
             if (SPort != null && !SPort.IsOpen)
             {
+                //riconnectTo_s = SPort.PortName;
                 Port_Disconnect(); //Clean all previus connections
             }
+            CheckPort();
 
-            string[]? tempPorts = SerialPort.GetPortNames();
+
+            string[]? tempPorts = SerialPortStream.GetPortNames();
 
             if (ports_sr != null)
             {
+                /*
+
+                if (tempPorts.Contains(riconnectTo_s)) {
 
 
 
+                   //Port_Connect(riconnectTo_s);     //Auto-Riconnect post refresh
+                   //riconnectTo_s = null;
 
+                } ;
+                */
 
                 if (ports_sr.SequenceEqual(tempPorts))
                 {
@@ -329,50 +449,40 @@ namespace Exp
             ports_sr = tempPorts;
 
 
+            comPortsList.BeginUpdate();
 
-            string? lastPortName = " ";
-            var lastPort = comPortsList.SelectedIndex; //Saves the last selected port to reselect it after the refresh
+            var lastPortName = comPortsList.SelectedItem;
 
-            if (comPortsList.Items.Count != 0 && comPortsList.Items.Count > lastPort && lastPort != -1)
-            {
 
-                if (comPortsList.SelectedItem == null) { return; }
-                lastPortName = comPortsList.SelectedItem.ToString();
-            }
-            else { lastPort = -1; } //Clear Selection
+            
 
             comPortsList.ClearSelected();
             comPortsList.Items.Clear();
 
             //Fill the serial port list
-            ports_sr = SerialPort.GetPortNames();
+            ports_sr = SerialPortStream.GetPortNames();
 
 
 
 
-            comPortsList.BeginUpdate();
+            
             foreach (string port in ports_sr)
             {
                 comPortsList.Items.Add(port);
             }
-            if (appSettings.show_port_type_icon) { GetComBluetoothList(); }
+            if (appSettings.show_port_type_icon) { 
+                GetComBluetoothList(); }
 
 
+
+            
+            if (lastPortName != null && comPortsList.Items.Contains(lastPortName)) {
+                comPortsList.SelectedItem = lastPortName;
+            }
 
             comPortsList.EndUpdate();
-            if (lastPort != -1 && comPortsList.Items.Count > lastPort)
-            {
-                comPortsList.SelectedIndex = lastPort;
-                if (comPortsList.SelectedItem == null) { return; }
-                if (lastPortName != comPortsList.SelectedItem.ToString())
-                {
 
-                    comPortsList.SelectedIndex = -1;
 
-                }
-                return;
-            }
-            comPortsList.SelectedIndex = -1;
         }
     }
 }

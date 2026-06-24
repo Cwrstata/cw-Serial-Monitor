@@ -17,14 +17,14 @@ namespace Exp
     /// <summary>
     /// Helps to toggle varius types of Controls
     /// </summary>
-    public struct cwToggleControl
+    public static class cwToggleControl
     {
 
         /// <summary>
         /// Basic function that automatically toggles the "visible" value in controls.
         /// Returns positive when the object is visible.
         /// </summary>
-        public bool Toggle(Control obj)
+        public static bool Toggle(Control obj)
         {
 
             if (obj.Visible)
@@ -44,7 +44,7 @@ namespace Exp
         /// Sets ToolStripMenuItem.Checked to "value"
         /// Litteraly useles.
         /// </summary>
-        public void setCheck(bool value, ToolStripMenuItem obj)
+        public static void setCheck(bool value, ToolStripMenuItem obj)
         {
 
             obj.Checked = value;
@@ -54,9 +54,9 @@ namespace Exp
 
         /// <summary>
         /// Toggles the SplitContainer panel selected via "secondPanel".
-        /// Returns positive when the panel is visible.
         /// </summary>
-        public bool SplitToggle(SplitContainer obj, bool secondPanel = false)
+        /// <returns>Returns positive when the panel is visible.</returns>
+        public static bool SplitToggle(SplitContainer obj, bool secondPanel = false)
         {
 
 
@@ -85,6 +85,97 @@ namespace Exp
 
 
                 return !(obj.Panel1Collapsed = true);
+
+
+            }
+        }
+
+
+        /// <summary>
+        /// Toggles the SplitContainer panel selected via "secondPanel".
+        /// Hides the entire control if both panels are collapsed.
+        /// </summary>
+        /// <returns>Returns positive when the panel is visible.</returns>
+        public static bool SplitToggleHide(SplitContainer obj, bool secondPanel = false)
+        {
+
+
+            if (secondPanel == true)
+            {
+                if (!obj.Visible)
+                {
+                    obj.Show();
+
+                    obj.Panel2Collapsed = false;
+                    //if control was invisble, collapses the other panel.
+                    obj.Panel1Collapsed = true;
+                    return true;
+                }        
+                
+                if (obj.Panel2Collapsed)
+                {
+                    obj.Panel2Collapsed = false;
+                    
+
+                    return true;
+
+
+                }
+
+
+                if (obj.Panel1Collapsed)
+                {
+                    //Both can't be collapsed at the same time
+                    //It doesen't matter witch one is collapsed
+
+                    obj.Hide();
+
+                    return false;
+                } 
+
+                obj.Panel2Collapsed = true;
+                return false;
+
+            }
+            else
+            {
+
+
+                if (!obj.Visible)
+                {
+                    obj.Show();
+
+                    obj.Panel1Collapsed = false;
+                    obj.Panel2Collapsed = true;
+                    return true;
+                }
+
+
+
+
+                if (obj.Panel1Collapsed)
+                {
+                    obj.Panel1Collapsed = false;
+                    
+
+                    return true;
+
+
+                }
+
+
+                if (obj.Panel2Collapsed)
+                {
+                    //Both can't be collapsed at the same time
+                    //It doesen't matter witch one is collapsed
+
+                    obj.Hide();
+
+                    return false;
+                }
+
+                obj.Panel1Collapsed = true;
+                return false;
 
 
             }

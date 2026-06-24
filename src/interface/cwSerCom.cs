@@ -4,14 +4,16 @@
 //      https://github.com/Cwrstata/cw-Serial-Monitor
 //
 //      cwSerCom
-//          -v0.1.3a
-//      Settings can be now configured in an apporiate setting form.
-//      Devices are automaticly detected.
-//      Besides the port names, an icon appears indicating the device type.
+//          -v0.1.4a
+//      Bux fixes.
+//      Using SerialPortStream instead of IO.Ports.
+//      Improved Error Handling.      
+//
 // ---------------------------------------------------------------------------- //
 
 
-using System.IO.Ports;
+using RJCP.IO.Ports;
+using System.Diagnostics;
 
 
 namespace Exp
@@ -26,7 +28,7 @@ namespace Exp
     {
 
 
-        public static readonly string cwVersion = "v0.1.3a";
+        public static readonly string cwVersion = "v0.1.4a";
 
         //Rappresents the port indicator text, "Connected" = true;
         bool pOpen = false;
@@ -37,6 +39,7 @@ namespace Exp
         /// Overrided to handle WM_DEVICECHANGE.
         /// </summary>
         /// <param name="m"></param>
+        /// 
         protected override void WndProc(ref Message m)
         {
             switch (m.Msg)
@@ -46,10 +49,23 @@ namespace Exp
 
                     if (appSettings.list_auto_refresh)
                     {
-                        CheckPort();
+
+                        //DBT_DEVICEREMOVECOMPLETE && DBT_DEVICEARRIVAL
+                        if (m.WParam.ToInt32() == 0x8004 || m.WParam.ToInt32() == 0x8000)
+                        {
+
+                            this.BeginInvoke(new Action(() =>
+                            {
+
+                                CheckPort();
+                                Port_Refresh();
+
+                            }));
+
+                        }
 
 
-                        Port_Refresh();
+
 
                     }
 
@@ -61,7 +77,7 @@ namespace Exp
 
 
 
-        
+
 
 
 
@@ -82,32 +98,10 @@ namespace Exp
 
 
 
-        
-
-        /// <summary>
-        /// Called every time a new port is selected to retrieve all avaible informations.
-        /// </summary>
-        private void comPortList_SelectedIndexChanged(object? sender, EventArgs e)
-        {
-
-            //This happens only if approrpiate grid is visible.
-            if (dGridInfo.Visible)
-            {
-
-                if (comPortsList.SelectedIndex != -1 && comPortsList.SelectedIndex < comPortsList.Items.Count)
-                {
-
-                    if (comPortsList.SelectedItem == null) { return; }
-
-
-                    GetComPortDetails(comPortsList.SelectedItem.ToString());
-                }
-
-            }
 
 
 
-        }
+
 
 
 
@@ -115,64 +109,24 @@ namespace Exp
         {
 
 
-            if (SPort != null && SPort.IsOpen)
-            {
-                Button_Disconnect(0, null);
-            }
 
-            Button_Refresh(0, null);
+
+
+
+
+
+            Port_Refresh();
             CheckPort();
 
             if (comPortsList.SelectedIndex == -1) { return; }
             if (comPortsList.SelectedItem == null) { return; }
-            ;
-            SPort = new SerialPort(comPortsList.SelectedItem.ToString());
-
-
-            if (cellBaudRates.Value == null || cellParityType.Value == null || cellStopBits.Value == null || cellDataBits.Value == null)
-            {
-                //no more warnigs now hehe
-                return;
-            }
-
-
-            SPort.BaudRate = (int)cellBaudRates.Value;
-            SPort.ReadTimeout = 500;
-            SPort.WriteTimeout = 500;
-            SPort.Parity = (Parity)cellParityType.Items.IndexOf((string)cellParityType.Value);
-            SPort.StopBits = (StopBits)cellStopBits.Value;
-            SPort.DataBits = (int)cellDataBits.Value;
-
-
-            try { SPort.Open(); } catch { return; }
-
-            if (SPort.IsOpen)
-            {
-
-                CheckPort();
-                SPort.DataReceived += SPort_DataReceived;
-                SPort.ErrorReceived += SPort_Error;
 
 
 
-                if (SPort.BytesToRead != 0)
-                {
-                    SPort.DiscardInBuffer();
-                }
+            Port_Connect(comPortsList.SelectedItem.ToString());
 
 
 
-                if (cellParityType.Value == null) { return; }
-                if (cellParityType.Value.ToString() == null) { return; }
-
-#pragma warning disable CS8602 
-                label1.Text = "  " + SPort.PortName.ToString() + "    Baud rate: " + SPort.BaudRate.ToString()
-                    + "     Type: " + SPort.DataBits + cellParityType.Value.ToString()[0] + (int)(StopBits)cellStopBits.Value;
-#pragma warning restore CS8602 
-                ;
-
-
-            }
         }
 
         private void Button_Disconnect(object? sender, EventArgs? e)
@@ -182,7 +136,7 @@ namespace Exp
 
         }
 
-       
+
 
         void Button_Refresh(object? sender, EventArgs? e)
         {
@@ -194,7 +148,7 @@ namespace Exp
 
 
 
-        
+
 
 
         void Button_Clear(object? sender, EventArgs? e)
@@ -290,27 +244,32 @@ namespace Exp
 
         private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (cwSettings SettingsForm = new cwSettings()) { 
+            using (cwSettings SettingsForm = new cwSettings())
+            {
 
 
-            SettingsForm.ShowDialog();
+                SettingsForm.ShowDialog();
 
 
 
                 SettingsForm.Dispose();
                 applySettings();
 
-        }
+            }
         }
 
-        void applySettings() {
 
-           
+
+        void applySettings()
+        {
+
+
             if (appSettings.show_port_type_icon == true)
             {
                 comPortsList.DrawMode = DrawMode.OwnerDrawFixed;
             }
-            else {
+            else
+            {
                 comPortsList.DrawMode = DrawMode.Normal;
             }
 
@@ -320,14 +279,14 @@ namespace Exp
 
         }
 
-        
-        
+
+
 
         public static cwSettingsManager lSettings = new cwSettingsManager();
         static cwAppSettings appSettings = lSettings.appSettings;
         private void comPortsList_DrawItem(object sender, DrawItemEventArgs e)
         {
-           
+
             if (!appSettings.show_port_type_icon) { return; }
 
             //Check if the item is selected to draw the correct icon
@@ -339,23 +298,23 @@ namespace Exp
 
             e.DrawBackground();
 
-            
+
             Image icon;
-            string ?itemText = comPortsList.Items[e.Index].ToString();
+            string? itemText = comPortsList.Items[e.Index].ToString();
             if (e.Index >= 0)
             {
-               
+
 
 
                 if (BluetoothList[e.Index])
                 {
                     if (isSelected)
                     {
-                        icon = imageList1.Images[1]; 
+                        icon = imageList1.Images[1];
                     }
                     else
                     {
-                        icon = imageList1.Images[0]; 
+                        icon = imageList1.Images[0];
                     }
 
                 }
@@ -368,7 +327,7 @@ namespace Exp
                     }
                     else
                     {
-                        icon = imageList1.Images[2]; 
+                        icon = imageList1.Images[2];
                     }
                 }
 
@@ -376,11 +335,11 @@ namespace Exp
 
                 Rectangle textBounds = new Rectangle(e.Bounds.X, e.Bounds.Y, e.Bounds.Width - 35, e.Bounds.Height);
 
-                
+
 
                 e.Graphics.DrawImage(icon, iconBounds);
 
-                
+
                 TextRenderer.DrawText(e.Graphics, itemText, e.Font, textBounds, e.ForeColor, TextFormatFlags.Left | TextFormatFlags.VerticalCenter);
 
 
@@ -391,6 +350,11 @@ namespace Exp
         private void comPortsList_Resize(object sender, EventArgs e)
         {
             comPortsList.Invalidate();
+        }
+
+        private void programFolderToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Process.Start("explorer.exe",@$"{AppDomain.CurrentDomain.BaseDirectory}");
         }
     }
 

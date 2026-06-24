@@ -10,6 +10,12 @@
 
 namespace Exp
 {
+
+    public class cwAppSettings_interface
+    {
+        public bool show_info_grid { get; set; } = true;
+
+    }
     /// <summary>
     /// Class that contains all the program settings
     /// </summary>
@@ -21,6 +27,9 @@ namespace Exp
         public bool show_port_type_icon { get; set; } = true;
         public bool list_auto_refresh { get; set; } = true;
 
+        public cwAppSettings_interface? Interface { get; set; } = null;
+
     }
+
     
 }

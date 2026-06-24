@@ -4,8 +4,9 @@
 //      https://github.com/Cwrstata/cw-Serial-Monitor
 //
 //      cwDataGrids
-//           -v0.1.3a
-//      Moved some methods to .Serial.cs
+//           -v0.1.4a
+//      "Serial Info" datagrid now fills asynchronously.
+//
 // ---------------------------------------------------------------------------- //
 
 //This file contains everything that is related to the dataGridView objects in the form.
@@ -42,7 +43,7 @@ namespace Exp
         {
 
 
-
+            
 
 
             dGridSerial.DataSource = null;
@@ -145,7 +146,7 @@ namespace Exp
             dGridSerial.AutoResizeColumns();
 
             dGridSerial.ClearSelection();
-
+            dGridSerial.Columns[0].Width = 70;
 
         }
         //Two click dropdown fix
@@ -165,19 +166,17 @@ namespace Exp
                 ((ComboBox?)datagridview.EditingControl).DroppedDown = true;
 #pragma warning restore CS8602 
 
+                datagridview.EndEdit();
+
             }
         }
 
         /// <summary> 
-        /// Abquires port informations trough ManagementObjectSearcher, then redraws the grid.
+        /// Abquires port informations trough ManagementObjectSearcher.
         /// 
         /// </summary>
-        /// 
-
-        
-
-
-        public void GetComPortDetails(string? portn)
+        /// <returns>Return a ComPortDetails struct, if the querry provides no results returns null </returns>
+        public ComPortDetails? GetComPortDetails(string? portn)
         {
             //To do
             //Split this in two distinct methods
@@ -185,106 +184,132 @@ namespace Exp
             if (portn == null)
             {
                 //Abort if portn is null
-                return;
+                return null;
             }
+            ComPortDetails ret;
 
-            using (var searcher = new ManagementObjectSearcher($"SELECT * FROM Win32_PnPEntity WHERE Caption LIKE '%({portn})%'"))
+            using (ManagementObjectSearcher searcher = new ManagementObjectSearcher($"SELECT * FROM Win32_PnPEntity WHERE PNPClass = 'Ports' AND Caption LIKE '%({portn})%'"))
             {
-                // cellBaudRates.DetachEditingControl();
-
-
-                if (searcher.Get().Count == 0) { return; }
-
-                var port = searcher.Get().Cast<ManagementObject>().First();
-
-
-                dGridInfo.DataSource = null;
-                dGridInfo.Rows.Clear();
-                dGridInfo.Columns.Clear();
-
-                //Column
-                dGridInfo.Columns.Add("Info", "Info");
-                dGridInfo.Columns.Add("Data", "Data");
-                dGridInfo.EnableHeadersVisualStyles = false;
-                dGridInfo.ColumnHeadersDefaultCellStyle.BackColor = SystemColors.Control;
-                dGridInfo.Columns[0].SortMode = DataGridViewColumnSortMode.NotSortable;
-                dGridInfo.Columns[1].SortMode = DataGridViewColumnSortMode.NotSortable;
-               ;
-                //Cells
-
-                //Only non null information strings are displayed.
-                string? dataString = null;
-
-                dataString = port["Caption"]?.ToString();
-                if (dataString != null)
-                    dGridInfo.Rows.Add("Caption", dataString);
-
-                dataString = port["Manufacturer"]?.ToString();
-                if (dataString != null)
-                    dGridInfo.Rows.Add("Manufacturer", dataString);
-
-                dataString = port["Description"]?.ToString();
-                if (dataString != null)
-                    dGridInfo.Rows.Add("Description", dataString);
-
-                dataString = port["Present"]?.ToString();
-                if (dataString != null)
-                    dGridInfo.Rows.Add("Present", dataString);
-
-                dataString = port["Status"]?.ToString();
-                if (dataString != null)
-                    dGridInfo.Rows.Add("Status", dataString);
-
-                dataString = port["PNPDeviceID"]?.ToString();
-                if (dataString != null)
-                    dGridInfo.Rows.Add("PNP ID", dataString);
 
 
                 
+                    if (searcher.Get().Count == 0) { return null; }
 
+  
+                    var port = searcher.Get().Cast<ManagementObject>().FirstOrDefault();
+                    if (port == null) { return null; }
 
+                    
 
+              
 
+                ret.Caption = port["Caption"]?.ToString();
+                ret.Manufacturer = port["Manufacturer"]?.ToString();
+                ret.Description = port["Description"]?.ToString();
+                ret.Present = port["Present"]?.ToString();
+                ret.Status = port["Status"]?.ToString();
+                ret.PNPDeviceID = port["PNPDeviceID"]?.ToString();
 
-                dGridInfo.AutoResizeColumns();
-
-
-                int cellsHeight = dGridInfo.ClientRectangle.Height - dGridInfo.ColumnHeadersHeight;
-                int rowsHeight = cellsHeight / dGridInfo.Rows.Count;
-
-                foreach (DataGridViewRow row in dGridInfo.Rows)
-                {
-                    row.Height = rowsHeight;
-                }
-
-                DataGridViewColumn? lastColumn = dGridInfo.Columns.GetLastColumn(DataGridViewElementStates.Visible,
-                                    DataGridViewElementStates.None);
-                if (lastColumn != null)
-                {
-                    lastColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-                }
-            
-                dGridInfo.SelectionMode = 0;
-
-                dGridInfo.ClearSelection();
-
-                dGridSerial.Columns[0].Width = 70;
-
-
-
-
-
-
-
-
+                
 
             }
+
+            return ret;
         }
 
-        
+
+        /// <summary>
+        /// Called every time a new port is selected to retrieve all avaible informations.
+        /// </summary>
+        private async void comPortList_SelectedIndexChanged(object? sender, EventArgs e)
+        {
+
+            //This happens only if approrpiate grid is visible.
+            if (dGridInfo.Visible)
+            {
+
+                if (comPortsList.SelectedIndex != -1 && comPortsList.SelectedIndex < comPortsList.Items.Count)
+                {
+
+                    if (comPortsList.SelectedItem == null) { return; }
+
+                    string? port_s = comPortsList.SelectedItem.ToString();
+                    ComPortDetails ?cmDet= await Task.Run(() => GetComPortDetails(port_s));
+
+                    
+                    
+                    dGridInfo.DataSource = null;
+                    dGridInfo.Rows.Clear();
+                    dGridInfo.Columns.Clear();
+
+                    if (cmDet == null) { return; }
+                    //Column
+                    dGridInfo.Columns.Add("Info", "Info");
+                    dGridInfo.Columns.Add("Data", "Data");
+                    dGridInfo.EnableHeadersVisualStyles = false;
+                    dGridInfo.ColumnHeadersDefaultCellStyle.BackColor = SystemColors.Control;
+                    dGridInfo.Columns[0].SortMode = DataGridViewColumnSortMode.NotSortable;
+                    dGridInfo.Columns[1].SortMode = DataGridViewColumnSortMode.NotSortable;
+
+                    //Cells
+                    
+                    if (cmDet.Value.Caption != null)
+                        dGridInfo.Rows.Add("Caption", cmDet.Value.Caption);
+
+                    if (cmDet.Value.Manufacturer != null)
+                        dGridInfo.Rows.Add("Manufacturer", cmDet.Value.Manufacturer);
+
+                    if (cmDet.Value.Description != null)
+                        dGridInfo.Rows.Add("Description", cmDet.Value.Description);
+
+                    if (cmDet.Value.Present != null)
+                        dGridInfo.Rows.Add("Present", cmDet.Value.Present);
+
+                    if (cmDet.Value.Status != null)
+                        dGridInfo.Rows.Add("Status", cmDet.Value.Status);
+
+                    if (cmDet.Value.PNPDeviceID!=null)
+                        dGridInfo.Rows.Add("PNP ID", cmDet.Value.PNPDeviceID);
+
+                    dGridInfo.AutoResizeColumns();
+
+
+                    int cellsHeight = dGridInfo.ClientRectangle.Height - dGridInfo.ColumnHeadersHeight;
+                    int rowsHeight = cellsHeight / dGridInfo.Rows.Count;
+
+                    foreach (DataGridViewRow row in dGridInfo.Rows)
+                    {
+                        row.Height = rowsHeight;
+                    }
+
+                    DataGridViewColumn? lastColumn = dGridInfo.Columns.GetLastColumn(DataGridViewElementStates.Visible,
+                                        DataGridViewElementStates.None);
+                    if (lastColumn != null)
+                    {
+                        lastColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                    }
+
+                    dGridInfo.SelectionMode = 0;
+
+                    dGridInfo.ClearSelection();
+                }
+
+            }
+
+
+
+        }
 
     }
 
-
+    public struct ComPortDetails
+    {
+        public string? Caption;
+        public string? Manufacturer;
+        public string? Description;
+        public string? Present;
+        public string? Status;
+        public string? PNPDeviceID;
+    }
 
 }

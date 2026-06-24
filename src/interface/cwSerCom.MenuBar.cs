@@ -4,15 +4,15 @@
 //      https://github.com/Cwrstata/cw-Serial-Monitor
 //
 //      cwMenuBar
+//          -v0.1.4a
+//      Fixed "View" button interactions.
 // ---------------------------------------------------------------------------- //
-
 
 
 
 
 //Contains menu items and interactions.
 //Also, most interface management is done here (such as showing or hiding a panel).
-
 
 using System.Diagnostics;
 
@@ -23,19 +23,30 @@ namespace Exp
 
 
 
-        cwToggleControl cwToggleController = new cwToggleControl();
 
         /// <summary>
         /// Checks if the left container is empty, if so hides it.
         /// </summary>
         private void splitLeftCheck()
         {
-            if (splitContainer2.Panel1Collapsed == true && !dGridInfo.Visible && !dGridSerial.Visible)
+
+            // fixed bug 0x0004
+            if (!splitMain.Visible)
             {
-                splitMain.Panel1Collapsed = true;
+
+                cwToggleControl.SplitToggleHide(splitMain, false);
                 return;
             }
-            splitMain.Panel1Collapsed = false;
+            if (splitContainer2.Panel1Collapsed == true && !dGridInfo.Visible && !dGridSerial.Visible)
+            {
+
+                //Automatically hides both if none of them are visible.
+                cwToggleControl.SplitToggleHide(splitMain, false);
+
+
+                return;
+            }
+            
 
         }
 
@@ -44,8 +55,8 @@ namespace Exp
                 //Port Selector
         private void portSelectorMenuItem2_Click(object sender, EventArgs e)
         {
-            cwToggleController.setCheck(
-                cwToggleController.SplitToggle(splitContainer2, false),
+            cwToggleControl.setCheck(
+                cwToggleControl.SplitToggle(splitContainer2, false),
                 (ToolStripMenuItem)sender);
 
             splitLeftCheck();
@@ -56,8 +67,8 @@ namespace Exp
             
             splitMain.Panel1Collapsed = false;
 
-            cwToggleController.setCheck(
-                cwToggleController.Toggle(dGridSerial),
+            cwToggleControl.setCheck(
+                cwToggleControl.Toggle(dGridSerial),
                 (ToolStripMenuItem)sender);
 
             splitLeftCheck();
@@ -66,8 +77,8 @@ namespace Exp
         private void serialInfoToolStripMenuItem_Click(object sender, EventArgs e)
         {
             splitMain.Panel1Collapsed = false;
-            cwToggleController.setCheck(
-               cwToggleController.Toggle(dGridInfo),
+            cwToggleControl.setCheck(
+               cwToggleControl.Toggle(dGridInfo),
                (ToolStripMenuItem)sender);
 
             splitLeftCheck();
@@ -75,8 +86,8 @@ namespace Exp
                 //Serial Monitor
         private void serialMonitorToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            cwToggleController.setCheck(
-                cwToggleController.SplitToggle(splitMain, true),
+            cwToggleControl.setCheck(
+                cwToggleControl.SplitToggleHide(splitMain, true),
                 (ToolStripMenuItem)sender);
         }
 
@@ -100,9 +111,20 @@ namespace Exp
 
         private void infoToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Version: " + cwVersion+ "\r\n\r\n@Cwrstata", "cw Serial Monitor",
-                                   MessageBoxButtons.OK,
-                                   MessageBoxIcon.Information);
+
+            //New Message Box
+            TaskDialogPage mBox = new TaskDialogPage()
+            {
+                Heading = "cw Serial Monitor",
+                Text = "Version: " + cwVersion + "\r\n@Cwrstata",
+                Caption = "cw Serial Monitor",
+
+
+
+
+            };
+            if (Icon != null){ mBox.Icon = new TaskDialogIcon(Icon); }
+            TaskDialog.ShowDialog(this, mBox);
         }
 
     }

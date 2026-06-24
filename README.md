@@ -1,4 +1,4 @@
-# **cw Serial Monitor (v0.1.3a)**
+# **cw Serial Monitor (v0.1.4a)**
 
 
 
@@ -16,10 +16,10 @@ _
 It features all of the basic serial monitor elements, in a clean windows-styled interface.
 My true intention for this project was file sharing through serial, a feature that i'll soon add.
 
-![Static Badge](https://img.shields.io/badge/Release-v0.1.3a-brightgreen?link=https%3A%2F%2Fgithub.com%2FCwrstata%2Fcw-Serial-Monitor%2Freleases%2Ftag%2Fv0.1.3a)
+![Static Badge](https://img.shields.io/badge/Release-v0.1.4a-brightgreen?link=https%3A%2F%2Fgithub.com%2FCwrstata%2Fcw-Serial-Monitor%2Freleases%2Ftag%2Fv0.1.4a)
 
 
-https://github.com/Cwrstata/cw-Serial-Monitor/releases/tag/v0.1.3a
+https://github.com/Cwrstata/cw-Serial-Monitor/releases/tag/v0.1.4a
 
 ## Usage
 
