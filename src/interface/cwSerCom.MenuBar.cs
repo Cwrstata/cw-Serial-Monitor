@@ -4,8 +4,8 @@
 //      https://github.com/Cwrstata/cw-Serial-Monitor
 //
 //      cwMenuBar
-//          -v0.1.4a
-//      Fixed "View" button interactions.
+//          -v1.0.0
+//      You can now connect to ports using only the menubar.
 // ---------------------------------------------------------------------------- //
 
 
@@ -99,6 +99,88 @@ namespace Exp
             Process.Start(new ProcessStartInfo("https://github.com/Cwrstata/cw-Serial-Monitor/tree/main") { UseShellExecute = true });
         }
 
+
+
+
+
+     
+
+        private void Check_Pin_CheckedChanged(object sender, EventArgs e)
+        {
+
+
+
+            if (((CheckBox)sender).Checked)
+            {
+                lastShow = splitMain.Visible;
+                splitMain.Show();
+
+
+                lastPanel1Collapsed = splitMain.Panel1Collapsed;
+
+                viewToolStripMenuItem.Enabled = false;
+                splitMain.Panel1Collapsed = false;
+                splitMain.Panel2Collapsed = false;
+                splitMain.Panel1Collapsed = true;
+                this.MaximizeBox = false;
+
+                lastWindowState = this.WindowState;
+
+                this.WindowState = FormWindowState.Normal;
+
+                lastTopMost = this.TopMost;
+                this.TopMost = true;
+                this.FormBorderStyle = FormBorderStyle.FixedDialog;
+
+                lastSize = this.Size;
+
+
+                this.Size = this.MinimumSize;
+
+
+            } else
+            {
+
+                splitMain.Visible= lastShow;
+            
+
+
+                splitMain.Panel1Collapsed= lastPanel1Collapsed;
+
+                viewToolStripMenuItem.Enabled = true;
+    
+                this.MaximizeBox = true;
+
+                this.WindowState= lastWindowState;
+
+
+
+                this.TopMost=lastTopMost;
+
+                this.FormBorderStyle = FormBorderStyle.Sizable;
+
+                this.Size = lastSize;
+
+
+
+            }
+        }
+
+
+
+
+       bool lastShow;
+       Size lastSize;
+       bool lastTopMost;
+       FormWindowState lastWindowState;
+       bool lastPanel1Collapsed;
+
+        
+
+
+
+
+
         private void CursorToArrow(object sender, EventArgs e)
         {
             this.Cursor = Cursors.Arrow;
@@ -116,7 +198,7 @@ namespace Exp
             TaskDialogPage mBox = new TaskDialogPage()
             {
                 Heading = "cw Serial Monitor",
-                Text = "Version: " + cwVersion + "\r\n@Cwrstata",
+                Text = "Version: " + cwVersion + "\r\n@Cwrstata\r\n"+ "https://github.com/Cwrstata/cw-Serial-Monitor/",
                 Caption = "cw Serial Monitor",
 
 
@@ -127,6 +209,12 @@ namespace Exp
             TaskDialog.ShowDialog(this, mBox);
         }
 
+
+
+        private void programFolderToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Process.Start("explorer.exe", @$"{AppDomain.CurrentDomain.BaseDirectory}");
+        }
     }
 
 

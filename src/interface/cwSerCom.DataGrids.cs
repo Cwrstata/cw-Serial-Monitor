@@ -4,14 +4,16 @@
 //      https://github.com/Cwrstata/cw-Serial-Monitor
 //
 //      cwDataGrids
-//           -v0.1.4a
-//      "Serial Info" datagrid now fills asynchronously.
+//           -v1.0.0a
+//      General Optimizations
+//      
 //
 // ---------------------------------------------------------------------------- //
 
 //This file contains everything that is related to the dataGridView objects in the form.
 
 using System.Management;
+using System.Windows.Forms;
 
 
 namespace Exp
@@ -28,12 +30,12 @@ namespace Exp
         List<int> BaudRates = new List<int> { 1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200, 230400, 460800, 921600 };
         List<string> ParityType = new List<string> { "None", "Odd", "Even", "Mark", "Space" };
         List<int> DataBits = new List<int> { 5, 6, 7, 8 };
-        List<int> sStopBits = new List<int> { 1, 2 };
+        List<decimal> sStopBits = new List<decimal> { 1, 1.5m ,2 };
         //Cells
         DataGridViewComboBoxCell cellBaudRates = new DataGridViewComboBoxCell();
         DataGridViewComboBoxCell cellDataBits = new DataGridViewComboBoxCell();
         DataGridViewComboBoxCell cellParityType = new DataGridViewComboBoxCell();
-        DataGridViewComboBoxCell cellStopBits = new DataGridViewComboBoxCell();
+        DataGridViewComboBoxCell cellStopBits = new DataGridViewComboBoxCell(); // fixed bug 0x0005 
 
         /// <summary>
         /// Called only once at program startup.
@@ -41,9 +43,10 @@ namespace Exp
         /// </summary>
         public void cellSerial()
         {
-
-
             
+
+
+
 
 
             dGridSerial.DataSource = null;
@@ -51,7 +54,7 @@ namespace Exp
             dGridSerial.Columns.Clear();
 
 
-
+           
             //Column
             dGridSerial.Columns.Add("Settings", "Settings");
             dGridSerial.Columns.Add("Value", "Value");
@@ -102,11 +105,11 @@ namespace Exp
             //StopBits Selector
             selCell = dGridSerial.Rows.Add("Stop Bits");
             cellStopBits.DataSource = sStopBits;
-            cellStopBits.ValueType = typeof(int);
+            cellStopBits.ValueType = typeof(decimal);
             dGridSerial[1, selCell] = cellStopBits;
             dGridSerial[0, selCell].Selected = false;
             dGridSerial[0, selCell].ReadOnly = true;
-            cellStopBits.Value = 1;       //Default Value
+            cellStopBits.Value = (decimal)1;       //Default Value
             cellStopBits.ReadOnly = false;
 
 
@@ -149,37 +152,42 @@ namespace Exp
             dGridSerial.Columns[0].Width = 70;
 
         }
-        //Two click dropdown fix
-        private void datagridview_CellEnter(object sender, DataGridViewCellEventArgs e)
-        { //It may do nothing a at all :<
-           
-            var datagridview = sender as DataGridView;
-            if (datagridview == null || (e.RowIndex != -1 && e.ColumnIndex != -1)) { 
-                //Returns if grid is null or if the cell is not selected.
-                return; }
+        
 
-            if (datagridview.Columns[e.ColumnIndex] is DataGridViewComboBoxColumn)
+        /// <summary>
+        /// Datagrid one click combo box.
+        /// </summary>
+        private void dGridSerial_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            // fixed bug 0x0008
+            if (e.RowIndex >= 0 && e.ColumnIndex == 1) //Only works on the second column
             {
-                datagridview.BeginEdit(true);
 
-#pragma warning disable CS8602 
-                ((ComboBox?)datagridview.EditingControl).DroppedDown = true;
-#pragma warning restore CS8602 
+                if (dGridSerial[e.ColumnIndex,e.RowIndex] is DataGridViewComboBoxCell)
+                {
+                    dGridSerial.CurrentCell = dGridSerial.Rows[e.RowIndex].Cells[e.ColumnIndex];
+                    dGridSerial.BeginEdit(true);
 
-                datagridview.EndEdit();
 
+                    if (dGridSerial.EditingControl is ComboBox comboBox)
+                    {
+                        comboBox.DroppedDown = true;
+                    }
+                    dGridSerial.EndEdit();
+                }
             }
         }
 
+
+
+
         /// <summary> 
         /// Abquires port informations trough ManagementObjectSearcher.
-        /// 
         /// </summary>
         /// <returns>Return a ComPortDetails struct, if the querry provides no results returns null </returns>
         public ComPortDetails? GetComPortDetails(string? portn)
         {
-            //To do
-            //Split this in two distinct methods
+
 
             if (portn == null)
             {
@@ -221,7 +229,7 @@ namespace Exp
         /// <summary>
         /// Called every time a new port is selected to retrieve all avaible informations.
         /// </summary>
-        private async void comPortList_SelectedIndexChanged(object? sender, EventArgs e)
+        private async void comPortList_SelectedIndexChanged(object sender, EventArgs e)
         {
 
             //This happens only if approrpiate grid is visible.
@@ -234,6 +242,7 @@ namespace Exp
                     if (comPortsList.SelectedItem == null) { return; }
 
                     string? port_s = comPortsList.SelectedItem.ToString();
+
                     ComPortDetails ?cmDet= await Task.Run(() => GetComPortDetails(port_s));
 
                     
@@ -273,25 +282,9 @@ namespace Exp
 
                     dGridInfo.AutoResizeColumns();
 
-
-                    int cellsHeight = dGridInfo.ClientRectangle.Height - dGridInfo.ColumnHeadersHeight;
-                    int rowsHeight = cellsHeight / dGridInfo.Rows.Count;
-
-                    foreach (DataGridViewRow row in dGridInfo.Rows)
-                    {
-                        row.Height = rowsHeight;
-                    }
-
-                    DataGridViewColumn? lastColumn = dGridInfo.Columns.GetLastColumn(DataGridViewElementStates.Visible,
-                                        DataGridViewElementStates.None);
-                    if (lastColumn != null)
-                    {
-                        lastColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-                    }
-
-                    dGridInfo.SelectionMode = 0;
-
+                    dGridInfo_Move(dGridInfo, e);
                     dGridInfo.ClearSelection();
+                   
                 }
 
             }
@@ -299,6 +292,36 @@ namespace Exp
 
 
         }
+
+
+
+        private void dGridInfo_Move(object sender, EventArgs e)
+        {
+
+            var datagridview = sender as DataGridView;
+            if (datagridview == null) { return; }
+            if (datagridview.Rows.Count == 0) { return; }
+            int cellsHeight = dGridInfo.ClientRectangle.Height - dGridInfo.ColumnHeadersHeight;
+            int rowsHeight = cellsHeight / datagridview.Rows.Count;
+
+            foreach (DataGridViewRow row in dGridInfo.Rows)
+            {
+                row.Height = rowsHeight;
+            }
+
+            DataGridViewColumn? lastColumn = datagridview.Columns.GetLastColumn(DataGridViewElementStates.Visible,
+                                DataGridViewElementStates.None);
+
+            datagridview.SelectionMode = 0;
+
+            if (lastColumn == null) { return; }
+            ;
+
+            lastColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+
+
+        }
+
 
     }
 

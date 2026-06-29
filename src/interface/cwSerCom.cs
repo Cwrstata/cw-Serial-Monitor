@@ -5,15 +5,16 @@
 //
 //      cwSerCom
 //          -v0.1.4a
-//      Bux fixes.
-//      Using SerialPortStream instead of IO.Ports.
-//      Improved Error Handling.      
+//      You can now pin the terminal window.
+//      You can now connect to ports using only the menubar.
+//          
 //
 // ---------------------------------------------------------------------------- //
 
 
 using RJCP.IO.Ports;
 using System.Diagnostics;
+using System.Runtime;
 
 
 namespace Exp
@@ -28,7 +29,7 @@ namespace Exp
     {
 
 
-        public static readonly string cwVersion = "v0.1.4a";
+        public static readonly string cwVersion = "v1.0.0";
 
         //Rappresents the port indicator text, "Connected" = true;
         bool pOpen = false;
@@ -76,11 +77,6 @@ namespace Exp
         }
 
 
-
-
-
-
-
         public cwSerCom()
         {
             InitializeComponent();
@@ -90,18 +86,11 @@ namespace Exp
             Port_Refresh();
 
 
-            SerialSend.KeyDown += SerialSend_KeyDown;
+  
             cellSerial();
 
 
         }
-
-
-
-
-
-
-
 
 
 
@@ -136,9 +125,7 @@ namespace Exp
 
         }
 
-
-
-        void Button_Refresh(object? sender, EventArgs? e)
+        private void Button_Refresh(object? sender, EventArgs? e)
         {
 
             Port_Refresh();
@@ -146,19 +133,12 @@ namespace Exp
 
         }
 
-
-
-
-
-
-        void Button_Clear(object? sender, EventArgs? e)
+        private void Button_Clear(object? sender, EventArgs? e)
         {
-            textBox1.Clear();
+            textBoxMonitor.Clear();
+            textBoxMonitor.AppendText(Environment.NewLine);
 
         }
-
-
-
 
 
 
@@ -167,43 +147,24 @@ namespace Exp
             dGridSerial.ClearSelection();
         }
 
-        private void dGridInfo_Move(object sender, EventArgs e)
-        {
-
-            var datagridview = sender as DataGridView;
-            if (datagridview == null) { return; }
-            if (datagridview.Rows.Count == 0) { return; }
-            int cellsHeight = dGridInfo.ClientRectangle.Height - dGridInfo.ColumnHeadersHeight;
-            int rowsHeight = cellsHeight / datagridview.Rows.Count;
-
-            foreach (DataGridViewRow row in dGridInfo.Rows)
-            {
-                row.Height = rowsHeight;
-            }
-
-            DataGridViewColumn? lastColumn = datagridview.Columns.GetLastColumn(DataGridViewElementStates.Visible,
-                                DataGridViewElementStates.None);
-
-            datagridview.SelectionMode = 0;
-
-            if (lastColumn == null) { return; }
-            ;
-
-            lastColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-
-
-        }
+       
 
 
 
         private void cwSerCom_Load(object sender, EventArgs e)
         {
+
+            this.Text += " - " +cwVersion;
             //Sets the default newline to "\n";
             serialNewline.SelectedIndex = 0;
 
 
             lSettings.read();
             appSettings = lSettings.appSettings;
+
+
+            textBoxMonitor.Text += Environment.NewLine;
+
             applySettings();
         }
 
@@ -242,6 +203,8 @@ namespace Exp
 
         }
 
+
+
         private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             using (cwSettings SettingsForm = new cwSettings())
@@ -252,7 +215,7 @@ namespace Exp
 
 
 
-                SettingsForm.Dispose();
+
                 applySettings();
 
             }
@@ -262,8 +225,9 @@ namespace Exp
 
         void applySettings()
         {
-
-
+            lSettings.nullFill();
+            appSettings = lSettings.appSettings;
+            appSettings.Serial = lSettings.appSettings.Serial;
             if (appSettings.show_port_type_icon == true)
             {
                 comPortsList.DrawMode = DrawMode.OwnerDrawFixed;
@@ -337,7 +301,7 @@ namespace Exp
 
 
 
-                e.Graphics.DrawImage(icon, iconBounds);
+               e.Graphics.DrawImage(icon, iconBounds);
 
 
                 TextRenderer.DrawText(e.Graphics, itemText, e.Font, textBounds, e.ForeColor, TextFormatFlags.Left | TextFormatFlags.VerticalCenter);
@@ -352,12 +316,124 @@ namespace Exp
             comPortsList.Invalidate();
         }
 
-        private void programFolderToolStripMenuItem_Click(object sender, EventArgs e)
+        
+
+        private void button1_Click(object sender, EventArgs e)
         {
-            Process.Start("explorer.exe",@$"{AppDomain.CurrentDomain.BaseDirectory}");
+            using (cwSettings SettingsForm = new cwSettings())
+            {
+
+                SettingsForm.tab_Serial_Click(sender, e);
+                SettingsForm.ShowDialog();
+
+
+
+                SettingsForm.Dispose();
+                applySettings();
+
+            }
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+            //New Message Box
+
+            if (SPort != null)
+            {
+                TaskDialogPage mBox = new TaskDialogPage();
+
+                mBox.Caption = "Port Info";
+                mBox.Heading = SPort.PortName.ToString();
+                mBox.Text += "Baud rate: " + SPort.BaudRate + Environment.NewLine;
+                mBox.Text += "Parity: " + SPort.Parity + Environment.NewLine;
+                mBox.Text += "Data bits: " + SPort.DataBits + Environment.NewLine;
+                mBox.Text += "Stop bits: " + SPort.StopBits + Environment.NewLine;
+                mBox.Text += "Data terminal Ready(DTR): " + SPort.DtrEnable + Environment.NewLine;
+                mBox.Text += "Request to send(RTS): " + SPort.RtsEnable + Environment.NewLine;
+                mBox.Text += "Read timeout: " + SPort.ReadTimeout + Environment.NewLine;
+                mBox.Text += "Write timeout: " + SPort.WriteTimeout + Environment.NewLine;
+
+                TaskDialog.ShowDialog(this,mBox);
+            }
+
+
+
+
+
+
+
+        }
+
+        
+
+        private void textBoxMonitor_Interact(object sender, EventArgs e)
+        {
+
+            //Selects the data textbox.
+            textBoxMonitor.DeselectAll();
+
+
+            SerialSend.Focus();
+
+
+            SerialSend.Select();
+
+
+            SerialSend.SelectionStart = SerialSend.Text.Length;
+
+
+            SerialSend.SelectionLength = 0;
+
+            this.ActiveControl = SerialSend;
+        }
+
+        private void connectToolStripMenuItem_Click(object? sender, EventArgs? e)
+        {
+            if (sender == null ) { return; }
+
+            string ?tempString = ((ToolStripItem)sender).Text;
+
+            if (tempString==null)
+            {
+                return;
+            }
+
+            if (tempString.StartsWith("COM"))
+            {
+                Port_Connect(tempString);
+
+            }
+
+
+        }
+
+
+
+     
+
+        private void textBox1_KeyPress(object sender, KeyPressEventArgs e)
+        {
+          
+
+                if (true)
+                {
+
+
+
+                SerialSend.Text += e.KeyChar.ToString();
+                    
+
+
+
+                }
+
+                textBoxMonitor_Interact(sender, e);
+            
         }
     }
 
-
-
 }
+
+
+
+

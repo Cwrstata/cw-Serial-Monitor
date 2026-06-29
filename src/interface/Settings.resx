@@ -117,7 +117,44 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <metadata name="spearator3.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="separator.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="spearator2.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="spearator4.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="label1.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="label5.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
   <metadata name="toolTip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
   </metadata>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        AAABAAEAEBAAAAEAIABvAgAAFgAAAIlQTkcNChoKAAAADUlIRFIAAAAQAAAAEAgGAAAAH/P/YQAAAAFz
+        UkdCAK7OHOkAAAAEZ0FNQQAAsY8L/GEFAAAACXBIWXMAAADDAAAAwwGdzv4zAAAAGXRFWHRTb2Z0d2Fy
+        ZQBQYWludC5ORVQgNS4xLjEyEwFHdAAAALhlWElmSUkqAAgAAAAFABoBBQABAAAASgAAABsBBQABAAAA
+        UgAAACgBAwABAAAAAwAAADEBAgARAAAAWgAAAGmHBAABAAAAbAAAAAAAAACnBwAA6AMAAKcHAADoAwAA
+        UGFpbnQuTkVUIDUuMS4xMgAAAwAAkAcABAAAADAyMzABoAMAAQAAAAEAAAAFoAQAAQAAAJYAAAAAAAAA
+        AgABAAIABAAAAFI5OAACAAcABAAAADAxMDAAAAAAm8volG06XQMAAAEbSURBVDhPrZJBdcNADES/Q8Bm
+        0ECpAayeGdRhEAZJGRSCzaDVAmggBILDoEbgXiQ/7b7c2rlYq9GsZyXBH9EAbNtW5xGRK3Cx4ztwBcg5
+        F3WHeBCRSUQmOx4D5fGUUppSSqSUIDow4ZsVrkDr6ie5GRhzzqWDAC9cgUeVK7BfoKqjCbBvD3Rmv6+4
+        0XUHrGH2BP/LoKo3LwJuwGBxC0ze1AYgpRTH8FDVI0DTNHvSmvYTn5Jzbp71oKsT3nG7oIBf0AMni1sR
+        OXtBEL8CLxbPthvFGDtgCRb35THxp3Gru6zH6AWOi1legO/AeROh2sRzGNVXWBy37VyBuAd3s3pS1QH4
+        CHWz2Z59C50opqCqd1V1e0ugPB6j+F/wC8gtXfnR4jfhAAAAAElFTkSuQmCCYhuvcs8zOIOpiPhY1/XP
+        VvEyrqeI73EbnzoJXMaz3LPcxCDXNYazuaXJzH/BvVLKh0aDhTxeY5O4mcovpt8US3ZBS8RhTjvI7pst
+        TaS/mbmDZIcaoK7rrYjYx3c8xWpe53w22Mw7f8YvvG4eUyeBf6yqqv9+zn8AZk99o2db/boAAAAASUVO
+        RK5CYII=
+</value>
+  </data>
 </root>

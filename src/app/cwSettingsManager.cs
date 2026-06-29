@@ -60,5 +60,20 @@ namespace Exp
 
         }
 
+        /// <summary>
+        /// Checks if appSettings or one of its branches are null.
+        /// When thats the case, it chenges them to the default values.
+        /// </summary>
+        public void nullFill()
+        {
+            if (appSettings == null) {
+                appSettings=new cwAppSettings();
+            }
+            if (appSettings.Serial == null) 
+            {
+                appSettings.Serial= new cwAppSettings_serial();
+            }
+
+        }
     }
 }
