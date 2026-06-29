@@ -1,4 +1,4 @@
-# **cw Serial Monitor (v0.1.4a)**
+# **cw Serial Monitor (v1.0.0)**
 
 
 
@@ -6,7 +6,8 @@ A simple and lightweight window based Serial input and output application made i
 
 
 
-<img width="933" height="549" alt="image" src="https://github.com/user-attachments/assets/b636b591-f886-4b62-aac1-356e7b19039d" />
+<img width="933" height="549" alt="image" src="https://github.com/user-attachments/assets/2fcba48c-3ff2-470a-b263-9866fe8ab890" />
+
 
 _
 
@@ -16,10 +17,13 @@ _
 It features all of the basic serial monitor elements, in a clean windows-styled interface.
 My true intention for this project was file sharing through serial, a feature that i'll soon add.
 
-![Static Badge](https://img.shields.io/badge/Release-v0.1.4a-brightgreen?link=https%3A%2F%2Fgithub.com%2FCwrstata%2Fcw-Serial-Monitor%2Freleases%2Ftag%2Fv0.1.4a)
+https://github.com/Cwrstata/cw-Serial-Monitor/releases/tag/v1.0.0   
 
 
-https://github.com/Cwrstata/cw-Serial-Monitor/releases/tag/v0.1.4a
+![Static Badge](https://img.shields.io/badge/Release-v1.0.0-brightgreen?link=https%3A%2F%2Fgithub.com%2FCwrstata%2Fcw-Serial-Monitor%2Freleases%2Ftag%2Fv1.0.0)
+
+
+
 
 ## Usage
 
@@ -34,7 +38,7 @@ https://github.com/Cwrstata/cw-Serial-Monitor/releases/tag/v0.1.4a
 
 This is basically my very first c# project so i apologize for the unholy code.
 
-If you are using an older system, it might be helpfull to disable the "show port type icon".
+If you are using an older system, it might be helpfull to disable the "show port type icon".  
 Settings can also be changed outside the application by creating a file named "settings.json" and configuring the following properties:
 ```
 {
@@ -45,12 +49,12 @@ Settings can also be changed outside the application by creating a file named "s
 
 ## To do
 
-* Get everything ready for release!
-* Advanced Serial output options.
-* Advanced preferances window.
-* Advanced settings window.
-* Arrangeable and customizable UI.
+
+* Fix Aruino IDE conflict during upload.
 * File sharing from and to the device.
+* Device naming, recognition and automatic connection.
+* Advanced settings and preferances windows.
+* Arrangeable and customizable UI.
 * Reorganize the code, the files and add notations.
 * Add an hexadecimal-based serial terminal.
 
