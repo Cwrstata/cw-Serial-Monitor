@@ -4,8 +4,8 @@
 //      https://github.com/Cwrstata/cw-Serial-Monitor
 //
 //      cwSerial
-//           -v1.0.0a
-//      Clicking on the monitor's header will display some additional informations.
+//           -v1.1.0a
+//      Added Sent messages browser list
 //
 // ---------------------------------------------------------------------------- //
 
@@ -15,6 +15,7 @@
 
 
 using RJCP.IO.Ports;
+using System.Collections;
 using System.Management;
 
 
@@ -48,7 +49,10 @@ namespace Exp
                 led.ForeColor = Color.Red;
                 led.TextAlign = ContentAlignment.MiddleLeft;
                 status.Text = "Disconnected";
-                status.Left -= 6;
+                status.Location = new Point(19, 3);
+
+
+
                 pOpen = false;
 
 
@@ -63,7 +67,8 @@ namespace Exp
                 led.ForeColor = Color.LimeGreen;
                 led.TextAlign = ContentAlignment.MiddleRight;
                 status.Text = "Connected";
-                status.Left += 6;
+    
+                status.Location = new Point(19+6, 3);
                 pOpen = true;
 
             }
@@ -114,13 +119,30 @@ namespace Exp
         /// Called when a key is pressed on the serial "Send" textbox. 
         /// When the enter key is pressed, and the port is in a working condition, prints all contained text to serial.
         /// </summary>
+        /// 
+
+
+
+        /// <summary>
+        /// Sent history queue
+        /// </summary>
+        Queue<string> Sent_QUE = new Queue<string>();
+
+        /// <summary>
+        /// Rappresents the position in the queue of sent messages.
+        /// </summary>
+        int SentLST_Pos = 0;
+        
+        //Queue for easier cleanup
         private void SerialSend_KeyDown(object? sender, KeyEventArgs e)
         {
 
+            
 
 
             if (e.KeyCode == Keys.Enter)
             {
+                SentLST_Pos = 0;
 
                 if (SPort == null)
                 {
@@ -137,6 +159,16 @@ namespace Exp
 
                         SPort.Write(SerialSend.Text.ToString() + serial_newLine_s);
 
+                        if (SerialSend.Text.ToString().Length != 0) {
+                            if (Sent_QUE.Count >= 32)
+                            {
+                                Sent_QUE.Dequeue();
+                                Sent_QUE.TrimExcess();
+                            }
+                            Sent_QUE.Enqueue(SerialSend.Text.ToString()); //Add Last message sent to history the queue
+                            
+                        }
+                      
                         SerialSend.Clear();
                         
                     }
@@ -160,6 +192,40 @@ namespace Exp
             }
 
 
+            //Sent history
+            if (e.KeyCode == Keys.Up) { 
+            
+            
+                if (Sent_QUE.Count != 0 && Sent_QUE.Count >= SentLST_Pos)
+                {
+                    
+                    e.SuppressKeyPress = true;
+                    SerialSend.Clear();
+                    SerialSend.Text = Sent_QUE.ElementAtOrDefault(Sent_QUE.Count - 1 - SentLST_Pos);
+                    SentLST_Pos++;
+                    SerialSend.SelectionStart = SerialSend.Text.Length;
+                }
+            
+            }
+
+            if (e.KeyCode == Keys.Down)
+            {
+
+
+                if (Sent_QUE.Count != 0 && SentLST_Pos != 0)
+                {
+
+                    
+
+                    e.SuppressKeyPress = true;
+                    SerialSend.Clear();
+                    SentLST_Pos--;
+                    
+                    SerialSend.Text = Sent_QUE.ElementAtOrDefault(Sent_QUE.Count - 1 - (SentLST_Pos-1));
+                    SerialSend.SelectionStart = SerialSend.Text.Length;
+                }
+
+            }
 
         }
 
@@ -223,11 +289,12 @@ namespace Exp
         /// <returns>Returns false if there was no connection to begin with.</returns>
         private bool Port_Disconnect()
         {
+            WatcherAbort();
 
             if (SPort != null)
             {
                 label_Info.Text = "";
-
+                
 
 
 
@@ -329,7 +396,7 @@ namespace Exp
                     SPort.ErrorReceived += SPort_Error;
 
 
-
+                    InitializeIDEWatcher();
 
                     if (SPort.BytesToRead != 0)
                     {

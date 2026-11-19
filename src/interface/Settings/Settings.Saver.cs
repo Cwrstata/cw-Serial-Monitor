@@ -3,8 +3,8 @@
 //      https://github.com/Cwrstata
 //      https://github.com/Cwrstata/cw-Serial-Monitor
 //
-//      cwSerCom
-//           -v1.0.0a
+//      cwSettings.Saver
+//           -v1.1.0a
 //      
 // ---------------------------------------------------------------------------- //
 
@@ -16,6 +16,7 @@ namespace Exp
 {
     public partial class cwSettings : Form
     {
+
 
         /// <summary>
         /// Global app settings manager referance
@@ -29,14 +30,6 @@ namespace Exp
 
 
 
-      
-
-
-
-        /// <summary>
-        /// Previusly selected button in the tab selector
-        /// </summary>
-        Label previus_label;
         public cwSettings()
         {
             InitializeComponent();
@@ -46,47 +39,32 @@ namespace Exp
         }
 
 
-        private void tab_General_Click(object sender, EventArgs e)
-        {
-
-            previus_label.BorderStyle = BorderStyle.None;
-
-            tabControl.SelectedIndex = 0;
-
-            tab_General.BorderStyle = BorderStyle.Fixed3D;
-            previus_label = tab_General;
-        }
-        public void tab_Serial_Click(object sender, EventArgs e)
-        {
-
-            previus_label.BorderStyle = BorderStyle.None;
-
-            tabControl.SelectedIndex = 1;
-
-            tab_Serial.BorderStyle = BorderStyle.Fixed3D;
-            previus_label = tab_Serial;
-        }
 
 
 
         private void cwSettings_Load(object sender, EventArgs e)
         {
-          
+
             tabControl.ItemSize = new Size(0, 1);
-           
+
 
             lSettings.read();
             //Set pointer
             appSettings = cwSerCom.lSettings.appSettings;
             settings_Load();
+          
 
         }
 
-
-        void settings_Load() {
+ 
+        void settings_Load()
+        {
 
             check_show_port_icon.Checked = appSettings.show_port_type_icon;
             check_list_auto_refresh.Checked = appSettings.list_auto_refresh;
+
+
+
 
             if (appSettings.Serial == null)
             {
@@ -97,11 +75,39 @@ namespace Exp
             numericUpDown1.Value = appSettings.Serial.timeout_read;
             numericUpDown3.Value = appSettings.Serial.timeout_write;
 
+            if (appSettings.Watcher == null)
+            {
+                appSettings.Watcher = new cwAppSettings_Watcher();
 
-  
+
+            }
+            WatcherMainCheck.Checked        =   appSettings.Watcher.enabled;
+            WatcherPath.Text                =    appSettings.Watcher.path;
+
+            WatcherFileType.Text            =   appSettings.Watcher.file_type;
+            WatcherSubDir.Checked           =   appSettings.Watcher.watch_sub_dir;
+
+            WatcherDisconnectOnly.Checked   =   appSettings.Watcher.disconnect_only;
+
+            WatcherFlashAfter.Value         =   appSettings.Watcher.assume_flashing_after;
+            WatcherFlashAt.Value            =   appSettings.Watcher.assume_flashing_at;
+            WatcherAbortAfter.Value         =   appSettings.Watcher.abort_after;
+            WatcherCloseAt.Value            =   appSettings.Watcher.close_at;
+
+
+
             
+
+        
+          
+
+
+
+
+
+
         }
-    
+
 
         private void resetall_Click(object sender, EventArgs e)
         {
@@ -113,7 +119,7 @@ namespace Exp
             //Reload settings
             //Uses te referance
             settings_Load();
-            
+
             //Restore the referance to allow saving.
             appSettings = cwSerCom.lSettings.appSettings;
         }
@@ -121,12 +127,12 @@ namespace Exp
 
         private void Save_Button_Click(object sender, EventArgs e)
         {
-         
+
             appSettings.show_port_type_icon = check_show_port_icon.Checked;
-           
 
 
-            
+
+
             appSettings.list_auto_refresh = check_list_auto_refresh.Checked;
 
             if (appSettings.Serial == null)
@@ -134,6 +140,12 @@ namespace Exp
                 //Never happens
                 appSettings.Serial = new cwAppSettings_serial();
             }
+            if (appSettings.Watcher == null)
+            {
+                //Never happens
+                appSettings.Watcher = new cwAppSettings_Watcher();
+            }
+
 
             appSettings.Serial.timeout_read = numericUpDown1.Value;
             appSettings.Serial.timeout_write = numericUpDown3.Value;
@@ -146,24 +158,41 @@ namespace Exp
             {
                 appSettings.Serial = null;
             }
-           
+
+
             
 
-           
+            appSettings.Watcher.enabled = WatcherMainCheck.Checked;
+            appSettings.Watcher.path = WatcherPath.Text;
+
+            appSettings.Watcher.file_type = WatcherFileType.Text;
+            appSettings.Watcher.watch_sub_dir = WatcherSubDir.Checked;
+
+            appSettings.Watcher.disconnect_only = WatcherDisconnectOnly.Checked;
+
+            appSettings.Watcher.assume_flashing_after = (int)WatcherFlashAfter.Value;
+            appSettings.Watcher.assume_flashing_at = WatcherFlashAt.Value;
+            appSettings.Watcher.abort_after = (int)WatcherAbortAfter.Value;
+            appSettings.Watcher.close_at = WatcherCloseAt.Value;
+
+            if (appSettings.Watcher.Equals(new cwAppSettings_Watcher()))
+            {
+                appSettings.Watcher = null;
+            }
+
+
 
             lSettings.write(appSettings);
 
 
-            if (appSettings.Serial == null) {
-                appSettings.Serial= new cwAppSettings_serial();
-            }
+          
 
-            
+
+
 
 
             this.Close();
         }
 
-        
     }
 }

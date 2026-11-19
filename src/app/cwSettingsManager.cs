@@ -72,7 +72,14 @@ namespace Exp
             if (appSettings.Serial == null) 
             {
                 appSettings.Serial= new cwAppSettings_serial();
+       
             }
+            if (appSettings.Watcher == null)
+            {
+                appSettings.Watcher = new cwAppSettings_Watcher();
+
+            }
+
 
         }
     }

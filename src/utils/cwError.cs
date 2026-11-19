@@ -40,6 +40,32 @@ namespace Exp
 
 
         }
+
+        public static void ErrorInfo(string exception , string title, string description, Form owner)
+        {
+
+            TaskDialog.ShowDialog(owner, new TaskDialogPage()
+            {
+                Caption = title,
+                Heading = description,
+                Text = exception,
+                Icon = TaskDialogIcon.Error,
+                Buttons = { TaskDialogButton.OK },
+
+                Expander = new TaskDialogExpander()
+                {
+                    Text = exception.ToString(),
+
+                    Position = TaskDialogExpanderPosition.AfterFootnote
+                }
+            });
+
+
+
+
+        }
+
+
     }
 
 }

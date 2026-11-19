@@ -4,9 +4,9 @@
 //      https://github.com/Cwrstata/cw-Serial-Monitor
 //
 //      cwSerCom
-//          -v0.1.4a
-//      You can now pin the terminal window.
-//      You can now connect to ports using only the menubar.
+//          -v1.1.0
+//      Added Sent messages browser list
+//      Add "Free Port when flashing" options in settings
 //          
 //
 // ---------------------------------------------------------------------------- //
@@ -29,7 +29,7 @@ namespace Exp
     {
 
 
-        public static readonly string cwVersion = "v1.0.0";
+        public static readonly string cwVersion = "v1.1.0";
 
         //Rappresents the port indicator text, "Connected" = true;
         bool pOpen = false;
@@ -86,7 +86,7 @@ namespace Exp
             Port_Refresh();
 
 
-  
+
             cellSerial();
 
 
@@ -147,14 +147,14 @@ namespace Exp
             dGridSerial.ClearSelection();
         }
 
-       
+
 
 
 
         private void cwSerCom_Load(object sender, EventArgs e)
         {
 
-            this.Text += " - " +cwVersion;
+            this.Text += " - " + cwVersion;
             //Sets the default newline to "\n";
             serialNewline.SelectedIndex = 0;
 
@@ -228,6 +228,8 @@ namespace Exp
             lSettings.nullFill();
             appSettings = lSettings.appSettings;
             appSettings.Serial = lSettings.appSettings.Serial;
+            appSettings.Watcher = lSettings.appSettings.Watcher;
+
             if (appSettings.show_port_type_icon == true)
             {
                 comPortsList.DrawMode = DrawMode.OwnerDrawFixed;
@@ -301,7 +303,7 @@ namespace Exp
 
 
 
-               e.Graphics.DrawImage(icon, iconBounds);
+                e.Graphics.DrawImage(icon, iconBounds);
 
 
                 TextRenderer.DrawText(e.Graphics, itemText, e.Font, textBounds, e.ForeColor, TextFormatFlags.Left | TextFormatFlags.VerticalCenter);
@@ -316,14 +318,14 @@ namespace Exp
             comPortsList.Invalidate();
         }
 
-        
+
 
         private void button1_Click(object sender, EventArgs e)
         {
             using (cwSettings SettingsForm = new cwSettings())
             {
 
-                SettingsForm.tab_Serial_Click(sender, e);
+                //SettingsForm.tab_General_Click(sender, e);
                 SettingsForm.ShowDialog();
 
 
@@ -353,7 +355,7 @@ namespace Exp
                 mBox.Text += "Read timeout: " + SPort.ReadTimeout + Environment.NewLine;
                 mBox.Text += "Write timeout: " + SPort.WriteTimeout + Environment.NewLine;
 
-                TaskDialog.ShowDialog(this,mBox);
+                TaskDialog.ShowDialog(this, mBox);
             }
 
 
@@ -364,7 +366,7 @@ namespace Exp
 
         }
 
-        
+
 
         private void textBoxMonitor_Interact(object sender, EventArgs e)
         {
@@ -389,11 +391,11 @@ namespace Exp
 
         private void connectToolStripMenuItem_Click(object? sender, EventArgs? e)
         {
-            if (sender == null ) { return; }
+            if (sender == null) { return; }
 
-            string ?tempString = ((ToolStripItem)sender).Text;
+            string? tempString = ((ToolStripItem)sender).Text;
 
-            if (tempString==null)
+            if (tempString == null)
             {
                 return;
             }
@@ -409,26 +411,51 @@ namespace Exp
 
 
 
-     
+
 
         private void textBox1_KeyPress(object sender, KeyPressEventArgs e)
         {
-          
 
-                if (true)
-                {
+
+            if (true)
+            {
 
 
 
                 SerialSend.Text += e.KeyChar.ToString();
-                    
 
 
 
-                }
 
-                textBoxMonitor_Interact(sender, e);
-            
+            }
+
+            textBoxMonitor_Interact(sender, e);
+
+        }
+
+        private void watcherToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (appSettings.Watcher ==null) { return; }
+            TaskDialogPage mBox = new TaskDialogPage();
+
+            mBox.Caption = "Watcher Info";
+
+
+            mBox.Text += "Enabled: " +  appSettings.Watcher.enabled + Environment.NewLine; ;
+            mBox.Text += "path: " + appSettings.Watcher.path + Environment.NewLine; ;
+
+            mBox.Text += "file_type: " + appSettings.Watcher.file_type + Environment.NewLine;
+            mBox.Text += "watch_sub_dir " + appSettings.Watcher.watch_sub_dir + Environment.NewLine;
+
+            mBox.Text += "disconnect_only: " + appSettings.Watcher.disconnect_only + Environment.NewLine;
+
+            mBox.Text += "assume_flashing_after: " + appSettings.Watcher.assume_flashing_after + Environment.NewLine;
+            mBox.Text += "assume_flashing_at: " + appSettings.Watcher.assume_flashing_at + Environment.NewLine;
+            mBox.Text += "abort_after: " + appSettings.Watcher.abort_after + Environment.NewLine;
+            mBox.Text += "close_at: " + appSettings.Watcher.close_at + Environment.NewLine;
+
+            TaskDialog.ShowDialog(this, mBox);
+
         }
     }
 

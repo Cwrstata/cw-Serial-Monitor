@@ -15,10 +15,19 @@
       <DependentUpon>cwSerCom.cs</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="src\interface\Settings.cs">
+    <Compile Update="src\interface\cwSerCom.Serial.IDEWatcher.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="src\utils\cwBorderComboBox.cs">
+    <Compile Update="src\interface\Settings\Settings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="src\interface\Settings\Settings.Interface.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="src\interface\Settings\Settings.Saver.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="src\utils\cwSuffixNumericUpAndDown.cs">
       <SubType>Component</SubType>
     </Compile>
   </ItemGroup>

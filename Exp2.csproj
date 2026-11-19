@@ -2,13 +2,12 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net9.0-windows7.0</TargetFramework>
+    <TargetFramework>net11.0-windows7.0</TargetFramework>
 	<VersionPrefix>1.0.0</VersionPrefix>
 	  
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
-    <SupportedOSPlatformVersion>7.0</SupportedOSPlatformVersion>
     <UseWPF>False</UseWPF>
     <ApplicationIcon>Serial.ico</ApplicationIcon>
     <StartupObject></StartupObject>
@@ -73,7 +72,25 @@
 
 	<RootNamespace>cwSerialMonitor</RootNamespace>
     
+
+
+
+
+
+	<AutoGenerateBindingRedirects>True</AutoGenerateBindingRedirects>
+    
+
+
+
+
+
+	<SupportedOSPlatformVersion>7.0</SupportedOSPlatformVersion>
+    
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="src\app\cwObjectPair.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <Content Include="Serial.ico" />
@@ -83,13 +100,32 @@
     <PackageReference Include="SerialPortStream" Version="2.4.2" />
     <PackageReference Include="System.Management" Version="10.0.9" />
   </ItemGroup>
-
+    <!--cwSerCom-->
   <ItemGroup>
+    <Compile Update="src\interface\cwSerCom.Serial.IDEWatcher.cs">
+      <SubType>Form</SubType>
+      <DependentUpon>cwSerCom.cs</DependentUpon>
+    </Compile>
     <Compile Update="src\interface\cwSerCom.Serial.cs">
       <SubType>Form</SubType>
       <DependentUpon>cwSerCom.cs</DependentUpon>
     </Compile>
+    <Compile Update="src\utils\cwBorderComboBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
   </ItemGroup>
+
+
+	<ItemGroup>
+		<Compile Update="src\interface\Settings\Settings.Saver.cs">
+			<SubType>Form</SubType>
+			<DependentUpon>Settings.cs</DependentUpon>
+		</Compile>
+		<Compile Update="src\interface\Settings\Settings.Interface.cs">
+			<SubType>Form</SubType>
+			<DependentUpon>Settings.cs</DependentUpon>
+		</Compile>
+	</ItemGroup>
 
   <ItemGroup>
     <Folder Include="icons\" />

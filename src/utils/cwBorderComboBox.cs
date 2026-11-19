@@ -16,8 +16,8 @@ using System.Drawing;
 using System.Windows.Forms;
 
 
-
-    public class cwBorderComboBox : ComboBox
+namespace Exp { 
+public class cwBorderComboBox : ComboBox
     {
 
         public cwBorderComboBox() { }
@@ -128,3 +128,4 @@ using System.Windows.Forms;
         }
     }
 
+}

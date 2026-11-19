@@ -35,13 +35,10 @@ namespace Exp
             components = new System.ComponentModel.Container();
             ToolStripSeparator toolStripSeparator2;
             ToolStripMenuItem programFolderToolStripMenuItem;
-            Button Disconnect;
-            Button Refresh;
             ToolStripMenuItem settingsToolStripMenuItem;
             ToolStripMenuItem aboutToolStripMenuItem;
             ToolStripMenuItem repositoryToolStripMenuItem;
             ToolStripMenuItem infoToolStripMenuItem;
-            Button Connect;
             Label label2;
             FlowLayoutPanel flowLayoutPanel1;
             Button button_Settings2;
@@ -51,6 +48,9 @@ namespace Exp
             DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle5 = new DataGridViewCellStyle();
+            Connect = new Button();
+            Disconnect = new Button();
+            Refresh = new Button();
             panel1 = new Panel();
             status = new Label();
             led = new Label();
@@ -76,17 +76,16 @@ namespace Exp
             portToolStripMenuItem = new ToolStripMenuItem();
             connectToolStripMenuItem = new ToolStripMenuItem();
             disconnectToolStripMenuItem = new ToolStripMenuItem();
+            debugToolStripMenuItem = new ToolStripMenuItem();
+            watcherToolStripMenuItem = new ToolStripMenuItem();
             folderBrowserDialog1 = new FolderBrowserDialog();
             imageList1 = new ImageList(components);
             toolStripSeparator2 = new ToolStripSeparator();
             programFolderToolStripMenuItem = new ToolStripMenuItem();
-            Disconnect = new Button();
-            Refresh = new Button();
             settingsToolStripMenuItem = new ToolStripMenuItem();
             aboutToolStripMenuItem = new ToolStripMenuItem();
             repositoryToolStripMenuItem = new ToolStripMenuItem();
             infoToolStripMenuItem = new ToolStripMenuItem();
-            Connect = new Button();
             label2 = new Label();
             flowLayoutPanel1 = new FlowLayoutPanel();
             button_Settings2 = new Button();
@@ -116,28 +115,6 @@ namespace Exp
             programFolderToolStripMenuItem.Size = new Size(156, 22);
             programFolderToolStripMenuItem.Text = "Program Folder";
             programFolderToolStripMenuItem.Click += programFolderToolStripMenuItem_Click;
-            // 
-            // Disconnect
-            // 
-            Disconnect.Location = new Point(4, 34);
-            Disconnect.Margin = new Padding(4, 3, 4, 3);
-            Disconnect.Name = "Disconnect";
-            Disconnect.Size = new Size(104, 25);
-            Disconnect.TabIndex = 1;
-            Disconnect.Text = "Disconnect";
-            Disconnect.UseVisualStyleBackColor = true;
-            Disconnect.Click += Button_Disconnect;
-            // 
-            // Refresh
-            // 
-            Refresh.Location = new Point(4, 65);
-            Refresh.Margin = new Padding(4, 3, 4, 3);
-            Refresh.Name = "Refresh";
-            Refresh.Size = new Size(104, 25);
-            Refresh.TabIndex = 5;
-            Refresh.Text = "Refresh";
-            Refresh.UseVisualStyleBackColor = true;
-            Refresh.Click += Button_Refresh;
             // 
             // settingsToolStripMenuItem
             // 
@@ -176,17 +153,6 @@ namespace Exp
             infoToolStripMenuItem.TextDirection = ToolStripTextDirection.Horizontal;
             infoToolStripMenuItem.Click += infoToolStripMenuItem_Click;
             // 
-            // Connect
-            // 
-            Connect.Location = new Point(4, 3);
-            Connect.Margin = new Padding(4, 3, 4, 3);
-            Connect.Name = "Connect";
-            Connect.Size = new Size(104, 25);
-            Connect.TabIndex = 0;
-            Connect.Text = "Connect";
-            Connect.UseVisualStyleBackColor = true;
-            Connect.Click += Button_Connect;
-            // 
             // label2
             // 
             label2.Anchor = AnchorStyles.Top | AnchorStyles.Right;
@@ -216,6 +182,39 @@ namespace Exp
             flowLayoutPanel1.Size = new Size(113, 152);
             flowLayoutPanel1.TabIndex = 2;
             // 
+            // Connect
+            // 
+            Connect.Location = new Point(4, 3);
+            Connect.Margin = new Padding(4, 3, 4, 3);
+            Connect.Name = "Connect";
+            Connect.Size = new Size(104, 25);
+            Connect.TabIndex = 0;
+            Connect.Text = "Connect";
+            Connect.UseVisualStyleBackColor = true;
+            Connect.Click += Button_Connect;
+            // 
+            // Disconnect
+            // 
+            Disconnect.Location = new Point(4, 34);
+            Disconnect.Margin = new Padding(4, 3, 4, 3);
+            Disconnect.Name = "Disconnect";
+            Disconnect.Size = new Size(104, 25);
+            Disconnect.TabIndex = 1;
+            Disconnect.Text = "Disconnect";
+            Disconnect.UseVisualStyleBackColor = true;
+            Disconnect.Click += Button_Disconnect;
+            // 
+            // Refresh
+            // 
+            Refresh.Location = new Point(4, 65);
+            Refresh.Margin = new Padding(4, 3, 4, 3);
+            Refresh.Name = "Refresh";
+            Refresh.Size = new Size(104, 25);
+            Refresh.TabIndex = 5;
+            Refresh.Text = "Refresh";
+            Refresh.UseVisualStyleBackColor = true;
+            Refresh.Click += Button_Refresh;
+            // 
             // panel1
             // 
             panel1.BorderStyle = BorderStyle.Fixed3D;
@@ -238,7 +237,7 @@ namespace Exp
             status.Size = new Size(79, 15);
             status.TabIndex = 3;
             status.Text = "Disconnected";
-            status.TextAlign = ContentAlignment.MiddleRight;
+            status.TextAlign = ContentAlignment.MiddleCenter;
             status.UseMnemonic = false;
             // 
             // led
@@ -246,10 +245,10 @@ namespace Exp
             led.BackColor = Color.Transparent;
             led.Font = new Font("Segoe UI", 14F, FontStyle.Regular, GraphicsUnit.Point, 2);
             led.ForeColor = Color.Red;
-            led.Location = new Point(-1, -4);
+            led.Location = new Point(0, -4);
             led.Margin = new Padding(4, 0, 4, 0);
             led.Name = "led";
-            led.Size = new Size(33, 28);
+            led.Size = new Size(32, 28);
             led.TabIndex = 2;
             led.Text = "l";
             led.TextAlign = ContentAlignment.MiddleLeft;
@@ -562,7 +561,7 @@ namespace Exp
             // menuStrip1
             // 
             menuStrip1.GripMargin = new Padding(2);
-            menuStrip1.Items.AddRange(new ToolStripItem[] { settingsToolStripMenuItem, viewToolStripMenuItem, portToolStripMenuItem, aboutToolStripMenuItem });
+            menuStrip1.Items.AddRange(new ToolStripItem[] { settingsToolStripMenuItem, viewToolStripMenuItem, portToolStripMenuItem, aboutToolStripMenuItem, debugToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
             menuStrip1.Padding = new Padding(7, 2, 0, 2);
@@ -591,6 +590,20 @@ namespace Exp
             disconnectToolStripMenuItem.Text = "Disconnect";
             disconnectToolStripMenuItem.Click += Button_Disconnect;
             // 
+            // debugToolStripMenuItem
+            // 
+            debugToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { watcherToolStripMenuItem });
+            debugToolStripMenuItem.Name = "debugToolStripMenuItem";
+            debugToolStripMenuItem.Size = new Size(54, 20);
+            debugToolStripMenuItem.Text = "Debug";
+            // 
+            // watcherToolStripMenuItem
+            // 
+            watcherToolStripMenuItem.Name = "watcherToolStripMenuItem";
+            watcherToolStripMenuItem.Size = new Size(118, 22);
+            watcherToolStripMenuItem.Text = "Watcher";
+            watcherToolStripMenuItem.Click += watcherToolStripMenuItem_Click;
+            // 
             // imageList1
             // 
             imageList1.ColorDepth = ColorDepth.Depth32Bit;
@@ -614,6 +627,7 @@ namespace Exp
             MinimumSize = new Size(600, 400);
             Name = "cwSerCom";
             Text = "cwSerialMonitor";
+            FormClosing += cwSerCom_FormClosing;
             Load += cwSerCom_Load;
             Shown += cwSerCom_Shown;
             flowLayoutPanel1.ResumeLayout(false);
@@ -677,6 +691,11 @@ namespace Exp
         private ToolStripMenuItem disconnectToolStripMenuItem;
         private ToolStripMenuItem connectToolStripMenuItem;
         private ImageList imageList1;
+        private Button Disconnect;
+        private Button Refresh;
+        private Button Connect;
+        private ToolStripMenuItem debugToolStripMenuItem;
+        private ToolStripMenuItem watcherToolStripMenuItem;
     }
 }
 
